@@ -1,13 +1,14 @@
-package com.ocbc.ms.dto;
+package com.ocbc.ms.model;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 public class MaternityLeaveCalculateResponse {
 
-    private String leaveEndDate;
+    private LocalDate leaveEndDate;
 
     /*
 
