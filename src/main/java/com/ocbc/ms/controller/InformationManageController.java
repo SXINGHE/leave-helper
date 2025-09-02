@@ -1,0 +1,38 @@
+package com.ocbc.ms.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * CRUD for city/company/policy
+ */
+@RestController
+@RequestMapping("/api/v1/info-manage")
+@RequiredArgsConstructor
+public class InformationManageController {
+
+    @PostMapping("/import-salary")
+    public ResponseEntity<String> importSalary() {
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/policy/inquiry")
+    public ResponseEntity<String> policyInquiry() {
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/policy/fetch")
+    public ResponseEntity<String> policyFetch() {
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
+
+}
