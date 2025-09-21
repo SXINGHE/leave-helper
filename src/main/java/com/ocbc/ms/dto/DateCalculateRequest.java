@@ -23,7 +23,7 @@ public class DateCalculateRequest {
      * 第几胎？
      * 默认为1
      */
-    private int seq = 1;
+    private int deliverySequence = 1;
 
     /**
      * 是否流产？
@@ -48,6 +48,7 @@ public class DateCalculateRequest {
      */
     private int regnancyDays;
     private boolean ectopicPregnancy;
+    private int recommendAbortionLeaveDays;
 
     /**
      * 难产假计算参数
@@ -55,7 +56,7 @@ public class DateCalculateRequest {
      * 难产类型
      * Guang Zhou 难产（剖腹产、会阴Ⅲ度破裂）另加30天；吸引产、钳产、臀位牵引产另加15天；
      */
-    private List<String> dystociaTypes;
+    private List<String> dystociaCodeList;
 
 
 }

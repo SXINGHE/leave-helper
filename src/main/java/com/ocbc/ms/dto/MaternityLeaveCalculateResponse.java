@@ -19,4 +19,6 @@ public class MaternityLeaveCalculateResponse {
         obj
      */
     private LeaveCalculateDetail leaveCalculateDetail;
+
+    private long currentLeaveDays = 0L;
 }
