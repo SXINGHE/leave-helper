@@ -13,6 +13,10 @@ public class Policy {
     private String cityName;
     private String companyName;
 
-    private List<MaternityLeaveDatePolicy> maternityLeavePolicy;
+    private MaternityLeaveDatePolicy statutoryPolicy;
+    private MaternityLeaveDatePolicy dystociaPolicy;
+    private MaternityLeaveDatePolicy moreInfantPolicy;
+    private MaternityLeaveDatePolicy otherExtendedPolicy;
+    private MaternityLeaveDatePolicy abortionPolicy;
 
 }

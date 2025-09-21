@@ -5,7 +5,7 @@ import com.ocbc.ms.dto.workday.DateCalculationRequest;
 import com.ocbc.ms.dto.workday.DateCalculationResponse;
 import com.ocbc.ms.dto.workday.HolidayCreateRequest;
 import com.ocbc.ms.entity.City;
-import com.ocbc.ms.entity.Holiday;
+import com.ocbc.ms.entity.SpecialDate;
 import com.ocbc.ms.repository.CityRepository;
 import com.ocbc.ms.repository.HolidayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +21,9 @@ import java.util.stream.Collectors;
 public class WorkdayCalculatorService {
     
     @Autowired
-    private CityRepository cityRepository;
-    
-    @Autowired
     private HolidayRepository holidayRepository;
     
     public DateCalculationResponse calculateDate(DateCalculationRequest request) {
-        City city = cityRepository.findByCityCode(request.getCityCode())
-                .orElseThrow(() -> new RuntimeException("城市代码不存在: " + request.getCityCode()));
-        
         LocalDate startDate = request.getStartDate();
         Integer days = request.getDays();
         DateCalculationRequest.DateType dateType = request.getDateType();
@@ -57,17 +51,17 @@ public class WorkdayCalculatorService {
         
         // 获取可能涉及的节假日范围（预估范围，实际可能需要更大）
         LocalDate estimatedEndDate = startDate.plusDays(days * 2); // 预估范围
-        List<Holiday> holidays = holidayRepository.findHolidaysByCityAndDateRange(cityCode, startDate, estimatedEndDate);
-        List<Holiday> workdays = holidayRepository.findWorkdaysByCityAndDateRange(cityCode, startDate, estimatedEndDate);
+        List<SpecialDate> specialDates = holidayRepository.findHolidaysByCityAndDateRange(cityCode, startDate, estimatedEndDate);
+        List<SpecialDate> workdays = holidayRepository.findWorkdaysByCityAndDateRange(cityCode, startDate, estimatedEndDate);
         
         // 转换为Set以提高查询效率
-        Set<LocalDate> holidayDates = holidays.stream()
+        Set<LocalDate> holidayDates = specialDates.stream()
                 .filter(h -> !h.getIsWorkday())
-                .map(Holiday::getHolidayDate)
+                .map(SpecialDate::getCalendarDate)
                 .collect(Collectors.toSet());
         
         Set<LocalDate> compensationWorkdays = workdays.stream()
-                .map(Holiday::getHolidayDate)
+                .map(SpecialDate::getCalendarDate)
                 .collect(Collectors.toSet());
         
         while (workdaysAdded < days) {
@@ -119,42 +113,34 @@ public class WorkdayCalculatorService {
         // 检查是否为周末
         if (isWeekend(date)) {
             // 检查是否为补班日
-            List<Holiday> workdays = holidayRepository.findHolidaysByCityAndDate(cityCode, date);
-            return workdays.stream().anyMatch(Holiday::getIsWorkday);
+            List<SpecialDate> workdays = holidayRepository.findHolidaysByCityAndDate(cityCode, date);
+            return workdays.stream().anyMatch(SpecialDate::getIsWorkday);
         }
         
         // 检查是否为节假日
-        List<Holiday> holidays = holidayRepository.findHolidaysByCityAndDate(cityCode, date);
-        boolean isHoliday = holidays.stream().anyMatch(h -> !h.getIsWorkday());
+        List<SpecialDate> specialDates = holidayRepository.findHolidaysByCityAndDate(cityCode, date);
+        boolean isHoliday = specialDates.stream().anyMatch(h -> !h.getIsWorkday());
         
         return !isHoliday;
     }
     
-    public List<Holiday> getHolidaysByCity(String cityCode, Integer year) {
+    public List<SpecialDate> getHolidaysByCity(String cityCode, Integer year) {
         return holidayRepository.findHolidaysByCityAndYear(cityCode, year);
     }
-    
-    public Holiday createHoliday(HolidayCreateRequest request) {
-        // 验证城市是否存在
-        City city = cityRepository.findByCityCode(request.getCityCode())
-                .orElseThrow(() -> new RuntimeException("城市代码不存在: " + request.getCityCode()));
-        
+
+    public SpecialDate createHoliday(HolidayCreateRequest request) {
         // 检查该日期是否已存在节假日记录
-        List<Holiday> existingHolidays = holidayRepository.findHolidaysByCityAndDate(
+        List<SpecialDate> existingSpecialDates = holidayRepository.findHolidaysByCityAndDate(
                 request.getCityCode(), request.getHolidayDate());
-        
-        if (!existingHolidays.isEmpty()) {
+        if (!existingSpecialDates.isEmpty()) {
             throw new RuntimeException("该城市在此日期已存在节假日记录: " + request.getHolidayDate());
         }
-        
         // 创建新的节假日记录
-        Holiday holiday = new Holiday();
-        holiday.setCity(city);  // 设置City对象而不是cityCode字符串
-        holiday.setHolidayDate(request.getHolidayDate());
-        holiday.setHolidayName(request.getHolidayName());
-        holiday.setIsWorkday(request.getIsWorkday());
-        holiday.setYear(request.getHolidayDate().getYear());  // 从日期中提取年份
-        
-        return holidayRepository.save(holiday);
+        SpecialDate specialDate = new SpecialDate();// 设置City对象而不是cityCode字符串
+        specialDate.setCalendarDate(request.getHolidayDate());
+        specialDate.setDescription(request.getHolidayName());
+        specialDate.setIsWorkday(request.getIsWorkday());
+        specialDate.setYear(request.getHolidayDate().getYear());  // 从日期中提取年份
+        return holidayRepository.save(specialDate);
     }
 }

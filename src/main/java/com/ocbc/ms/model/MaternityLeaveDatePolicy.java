@@ -10,10 +10,16 @@ public class MaternityLeaveDatePolicy {
     private int leaveDays;
 
     /**
-     * true -> workDay
-     * false -> calendarDay
+     *
      */
-    private boolean isWorkDay;
+    private boolean delayForPublicHoliday;
+
+    /**
+     * 目前全部为calendarDay
+     * true -> calendarDay
+     * false -> workday
+     */
+    private boolean calendarDay;
 
     /**
      * priority of the policy

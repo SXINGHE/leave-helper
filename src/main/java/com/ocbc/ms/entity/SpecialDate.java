@@ -12,31 +12,26 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "holidays")
+@Table(name = "special_date")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Holiday {
+public class SpecialDate {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-/*    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private City city;*/
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "holiday_type_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private HolidayType holidayType;
+    private CalendarType calendarType;
     
-    @Column(name = "holiday_date", nullable = false)
-    private LocalDate holidayDate;
+    @Column(name = "calendar_date", nullable = false)
+    private LocalDate calendarDate;
     
-    @Column(name = "holiday_name", nullable = false, length = 100)
-    private String holidayName;
+    @Column(name = "description", nullable = false, length = 100)
+    private String description;
     
     @Column(name = "is_workday")
     private Boolean isWorkday = false;
@@ -46,7 +41,7 @@ public class Holiday {
     
     @Column(name = "\"year\"", nullable = false)
     private Integer year;
-    
+
     @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
