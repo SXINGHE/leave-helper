@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class MaternityLeaveCalculateRequest {
+public class DateCalculateRequest {
 
     private String staffName;
     /**
@@ -44,6 +44,13 @@ public class MaternityLeaveCalculateRequest {
     private LocalDate leaveStartDate;
 
     /**
+     * 流产假计算参数
+     */
+    private int regnancyDays;
+    private boolean ectopicPregnancy;
+
+    /**
+     * 难产假计算参数
      * 默认为空
      * 难产类型
      * Guang Zhou 难产（剖腹产、会阴Ⅲ度破裂）另加30天；吸引产、钳产、臀位牵引产另加15天；

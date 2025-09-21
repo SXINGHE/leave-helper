@@ -1,7 +1,7 @@
 package com.ocbc.ms.controller;
 
 
-import com.ocbc.ms.dto.MaternityLeaveCalculateRequest;
+import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.MaternityLeaveCalculateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,13 +23,13 @@ public class MaternityLeaveController {
 
 
     @PostMapping("/calculateDate")
-    public ResponseEntity<MaternityLeaveCalculateResponse> calculateDate(MaternityLeaveCalculateRequest request) {
+    public ResponseEntity<MaternityLeaveCalculateResponse> calculateDate(DateCalculateRequest request) {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
 
     @PostMapping("/calculateMoney")
-    public ResponseEntity<MaternityLeaveCalculateResponse> calculateMoney(MaternityLeaveCalculateRequest request) {
+    public ResponseEntity<MaternityLeaveCalculateResponse> calculateMoney(DateCalculateRequest request) {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
