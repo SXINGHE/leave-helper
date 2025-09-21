@@ -3,6 +3,7 @@ package com.ocbc.ms.service.impl;
 import com.ocbc.ms.dto.LeaveCalculateDetail;
 import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.MaternityLeaveCalculateResponse;
+import com.ocbc.ms.dto.MoneyCalculateRequest;
 import com.ocbc.ms.model.rule.AbortionRule;
 import com.ocbc.ms.model.MaternityLeaveDatePolicy;
 import com.ocbc.ms.model.rule.OtherExtendedRule;
@@ -74,6 +75,11 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         return response;
     }
 
+    @Override
+    public MaternityLeaveCalculateResponse calculateMoney(MoneyCalculateRequest moneyCalculateRequest) {
+        return null;
+    }
+
 
     /**
      * 计算法定产假
@@ -118,7 +124,8 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     private void calculateOtherExtendedLeave(DateCalculateRequest request, MaternityLeaveCalculateResponse response, MaternityLeaveDatePolicy otherExtendedPolicy) {
         LocalDate leaveStartDate = response.getLeaveEndDate();
         if(CollectionUtils.isEmpty(otherExtendedPolicy.getOtherExtendedRules())) {
-            response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, otherExtendedPolicy.getLeaveDays(), otherExtendedPolicy.isCalendarDay(), otherExtendedPolicy.isDelayForPublicHoliday()));
+            response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, otherExtendedPolicy.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
+                    , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
             response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
             response.getLeaveCalculateDetail().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
         } else {
@@ -128,7 +135,8 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             var sortedRules = otherExtendedPolicy.getOtherExtendedRules().stream().sorted(Comparator.comparingInt(OtherExtendedRule::getMinDeliverySequence)).toList();
             for (OtherExtendedRule rule : sortedRules) {
                 if (request.getDeliverySequence() >= rule.getMinDeliverySequence()) {
-                    response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, rule.getLeaveDays(), otherExtendedPolicy.isCalendarDay(), otherExtendedPolicy.isDelayForPublicHoliday()));
+                    response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, rule.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
+                            , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
                     response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
                     if (StringUtils.isEmpty(rule.getDescription())) {
                         response.getLeaveCalculateDetail().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());

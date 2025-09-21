@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class DateCalculateRequest {
+public class MoneyCalculateRequest {
 
     private String staffName;
     /**

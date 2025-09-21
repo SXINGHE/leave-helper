@@ -22,14 +22,14 @@ public class CalendarType {
     /**
      * default
      */
-    @Column(name = "type_code", unique = true, nullable = false, length = 20)
-    private String typeCode;
+    @Column(name = "code", unique = true, nullable = false, length = 20)
+    private String code;
 
     /**
      * default
      */
-    @Column(name = "type_name", nullable = false, length = 50)
-    private String typeName;
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
 
     /**
      * 默认日历/*宗教专用日历

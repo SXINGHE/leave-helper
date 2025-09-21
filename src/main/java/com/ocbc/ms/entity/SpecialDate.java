@@ -22,10 +22,8 @@ public class SpecialDate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "holiday_type_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private CalendarType calendarType;
+    @Column(name = "calendar_code", nullable = false)
+    private String calendarCode;
     
     @Column(name = "calendar_date", nullable = false)
     private LocalDate calendarDate;
