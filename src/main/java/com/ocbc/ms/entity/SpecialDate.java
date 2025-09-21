@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "special_date")
+@Table(name = "t_special_date")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor

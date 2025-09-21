@@ -9,7 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "calendar_type")
+@Table(name = "t_calendar_type")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -24,7 +24,6 @@ public class CalendarType {
      */
     @Column(name = "type_code", unique = true, nullable = false, length = 20)
     private String typeCode;
-
 
     /**
      * default

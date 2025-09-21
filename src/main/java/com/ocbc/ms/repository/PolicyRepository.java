@@ -1,14 +1,14 @@
 package com.ocbc.ms.repository;
 
-import com.ocbc.ms.model.Policy;
+import com.ocbc.ms.entity.Policy;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Repository
-public interface PolicyRepository {
+public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
 
-    Optional<Policy> findByCityNameAndCompanyName(String cityName, String companyName);
+    Optional<Policy> findByCityName(String cityName);
 }
