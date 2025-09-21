@@ -2,6 +2,8 @@ package com.ocbc.ms.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class MaternityLeaveCalculateRequest {
 
@@ -25,7 +27,9 @@ public class MaternityLeaveCalculateRequest {
      */
     private String companyName;
 
-    private String leaveStartDate;
+    private LocalDate leaveStartDate;
+
+    private String leaveType;
 
 
 }
