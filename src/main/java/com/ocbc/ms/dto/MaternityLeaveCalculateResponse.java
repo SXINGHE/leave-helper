@@ -17,5 +17,5 @@ public class MaternityLeaveCalculateResponse {
     /*
         obj
      */
-    private String leaveCalculateDetail;
+    private LeaveCalculateDetail leaveCalculateDetail;
 }
