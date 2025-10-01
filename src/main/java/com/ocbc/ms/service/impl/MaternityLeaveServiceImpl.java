@@ -97,10 +97,14 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         BigDecimal govAllowance = getGovAllowance(policy.getAllowancePolicy(), descList);
         BigDecimal maternityAllowance = getMaternityAllowance(policy.getAllowancePolicy(), descList, request);
         BigDecimal salary = getSalary(descList, request, response.getAllowanceDetail());
-
-        var compensation = getCompensation(govAllowance, maternityAllowance, salary);
-        descList.add("4.需补差：" + compensation);
-
+        if ("Yes".equals(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
+            || ("Other".equalsIgnoreCase(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
+                    && request.isHitForceCompensationRule())) {
+            var compensation = getCompensation(govAllowance, maternityAllowance, salary);
+            descList.add("4.需补差：" + compensation);
+        } else {
+            descList.add("4.根据政策要求，此次产假津贴无需补差");
+        }
         return null;
     }
 
