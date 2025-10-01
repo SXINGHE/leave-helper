@@ -5,7 +5,7 @@ import com.ocbc.ms.model.MaternityLeaveDatePolicy;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;import org.hibernate.type.SqlTypes;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.JdbcTypeCode;
 import jakarta.persistence.Column;
 
@@ -17,7 +17,6 @@ import jakarta.persistence.Column;
 @Table(name = "t_policy")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Policy {
 
     @Id

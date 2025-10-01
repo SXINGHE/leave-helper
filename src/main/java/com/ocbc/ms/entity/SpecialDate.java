@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 @Table(name = "t_special_date")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class SpecialDate {
     
     @Id

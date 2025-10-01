@@ -3,7 +3,6 @@ package com.ocbc.ms.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 @Table(name = "t_city")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class City {
     
     @Id

@@ -3,13 +3,11 @@ package com.ocbc.ms.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "t_comment")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Comment {
 
     @Id

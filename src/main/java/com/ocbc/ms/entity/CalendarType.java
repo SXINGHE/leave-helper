@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "t_calendar_type")
 @Data
-@NoArgsConstructor
-@RequiredArgsConstructor
 public class CalendarType {
     
     @Id
