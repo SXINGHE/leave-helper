@@ -122,7 +122,11 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         calculateFirstMonthSalary(descList, request, allowanceDetail);
         calculateLastMonthSalary(descList, request, allowanceDetail);
         calculateOtherMonthSalary(descList, request, allowanceDetail);
-        return BigDecimal.ZERO;
+        var totalSalary = allowanceDetail.getFirstMonthSalary()
+                .add(allowanceDetail.getLastMonthSalary())
+                .add(allowanceDetail.getOtherMonthSalary());
+        descList.add(descPrefix + "总工资为" + totalSalary.toPlainString());
+        return totalSalary;
     }
 
     private void calculateFirstMonthSalary(List<String> descList, MoneyCalculateRequest request,
