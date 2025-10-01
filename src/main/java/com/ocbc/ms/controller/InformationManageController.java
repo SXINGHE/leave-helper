@@ -34,5 +34,10 @@ public class InformationManageController {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
+    @PostMapping("/getComment")
+    public ResponseEntity<String> getComment() {
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.ocbc.ms.entity;
 
+import com.ocbc.ms.model.AllowancePolicy;
 import com.ocbc.ms.model.MaternityLeaveDatePolicy;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -45,5 +46,10 @@ public class Policy {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "abortion_policy", columnDefinition = "jsonb")
     private MaternityLeaveDatePolicy abortionPolicy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "allowance_policy", columnDefinition = "jsonb")
+    private AllowancePolicy allowancePolicy;
+
 
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class LeaveCalculateDetail {
+public class CalculateComments {
 
     private List<String> descriptionList;
 }

@@ -1,9 +1,10 @@
 package com.ocbc.ms.service.impl;
 
-import com.ocbc.ms.dto.LeaveCalculateDetail;
+import com.ocbc.ms.dto.CalculateComments;
 import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.MaternityLeaveCalculateResponse;
 import com.ocbc.ms.dto.MoneyCalculateRequest;
+import com.ocbc.ms.model.AllowancePolicy;
 import com.ocbc.ms.model.rule.AbortionRule;
 import com.ocbc.ms.model.MaternityLeaveDatePolicy;
 import com.ocbc.ms.model.rule.OtherExtendedRule;
@@ -16,13 +17,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
-
+/**
+ * 
+ */
 @Service
 @Slf4j
 public class MaternityLeaveServiceImpl implements MaternityLeaveService {
@@ -32,14 +39,12 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     @Resource
     DateUtil dateUtil;
 
-
-
+    /**
+     * 
+     */
     @Override
     public MaternityLeaveCalculateResponse calculateDate(DateCalculateRequest request) {
-
         MaternityLeaveCalculateResponse response = new MaternityLeaveCalculateResponse();
-        response.setLeaveCalculateDetail(new LeaveCalculateDetail());
-        response.getLeaveCalculateDetail().setDescriptionList(new ArrayList<>());
         response.setLeaveEndDate(request.getLeaveStartDate());
 
         var policyOpt = policyRepository.findByCityName(request.getCityName());
@@ -63,12 +68,12 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             if (!CollectionUtils.isEmpty(request.getDystociaCodeList())) {
                 calculateDystociaLeave(request, response, policy.getDystociaPolicy());
             } else {
-                response.getLeaveCalculateDetail().getDescriptionList().add("2.难产假: 无");
+                response.getCalculateComments().getDescriptionList().add("2.难产假: 无");
             }
             if (request.getInfantNumber() >= 1) {
                 calculateMoreInfantLeave(request, response, policy.getMoreInfantPolicy());
             } else {
-                response.getLeaveCalculateDetail().getDescriptionList().add("3.多胎假: 无");
+                response.getCalculateComments().getDescriptionList().add("3.多胎假: 无");
             }
             calculateOtherExtendedLeave(request, response, policy.getOtherExtendedPolicy());
         }
@@ -76,10 +81,106 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     }
 
     @Override
-    public MaternityLeaveCalculateResponse calculateMoney(MoneyCalculateRequest moneyCalculateRequest) {
+    public MaternityLeaveCalculateResponse calculateMoney(MoneyCalculateRequest request) {
+        MaternityLeaveCalculateResponse response = new MaternityLeaveCalculateResponse();
+        var descList = response.getCalculateComments().getDescriptionList();
+        descList.add("计算生育津贴及其补差开始，当前城市为" + request.getCityName());
+
+        var policyOpt = policyRepository.findByCityName(request.getCityName());
+        if (policyOpt.isEmpty()) {
+            throw new RuntimeException("Policy not found");
+        }
+        var policy = policyOpt.get();
+        /*
+            step.1 计算政府发放金额
+            step.2 计算生育津贴
+            step.3 计算产假期间工资
+            step.4 计算需补差
+         */
+        BigDecimal govAllowance = getGovAllowance(policy.getAllowancePolicy(), descList);
+        BigDecimal maternityAllowance = getMaternityAllowance(policy.getAllowancePolicy(), descList, request);
+        BigDecimal salary = getSalary(policy.getAllowancePolicy(), descList, request);
+
+        var compensation = getCompensation(govAllowance, maternityAllowance, salary);
+        descList.add("4.需补差：" + compensation);
+
         return null;
     }
 
+    private BigDecimal getCompensation(BigDecimal govAllowance, BigDecimal maternityAllowance, BigDecimal salary) {
+        if (govAllowance.compareTo(maternityAllowance) >= 0) {
+            return govAllowance.subtract(salary);
+        } else {
+            return maternityAllowance.subtract(salary);
+        }
+    }
+
+    /**
+     * 
+     */
+    private BigDecimal getSalary(AllowancePolicy allowancePolicy, List<String> descList, MoneyCalculateRequest request) {
+        var descPrefix = "3.产假期间工资计算: ";
+        descList.add(descPrefix + "开始");
+
+        return BigDecimal.ZERO;
+    }
+
+    private int getTotalSalaryDays(LocalDate firstDayOfMonth, LocalDate lastDayOfMonth) {
+        if (firstDayOfMonth == null || lastDayOfMonth == null) {
+            return 0;
+        }
+        if (firstDayOfMonth.isAfter(lastDayOfMonth)) {
+            return 0;
+        }
+        int workdays = 0;
+        LocalDate date = firstDayOfMonth;
+        while (!date.isAfter(lastDayOfMonth)) { // inclusive
+            DayOfWeek dow = date.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
+                workdays++;
+            }
+            date = date.plusDays(1);
+        }
+        return workdays;
+    }
+
+    private int getRealSalaryDays(LocalDate realStartDate, LocalDate realEndDate) {
+        return (int) ChronoUnit.DAYS.between(realStartDate, realEndDate);
+    }
+
+    /**
+     * 
+     */
+    private BigDecimal getMaternityAllowance(AllowancePolicy allowancePolicy, List<String> descList, MoneyCalculateRequest request) {
+        var descPrefix = "2.生育津贴计算: ";
+        descList.add(descPrefix + "开始");
+        var baseSalaryOpt = allowancePolicy.getCorpSalaryDetailList().stream()
+                .filter(detail -> StringUtils.endsWithIgnoreCase(detail.getCompanyName(), request.getCompanyName()))
+                .findFirst();
+        if (baseSalaryOpt.isEmpty()) {
+            log.error("Base salary not found");
+            throw new RuntimeException("Base salary not found");
+        }
+        var allowanceDays = ChronoUnit.DAYS.between(request.getLeaveStartDate(), request.getLeaveEndDate());
+        descList.add(descPrefix + "津贴天数为" + allowanceDays);
+        var baseSalary = baseSalaryOpt.get();
+        descList.add(descPrefix + "公司月（缴费）平均工资为" + baseSalary.getCorpAverageSalary().toPlainString());
+        descList.add(descPrefix + "津贴基数分子为" + allowancePolicy.getNumerator() + " 津贴基数分母为 " + allowancePolicy.getDenominator());
+        var maternityAllowance = baseSalary.getCorpAverageSalary().multiply(allowancePolicy.getNumerator())
+                .multiply(new BigDecimal(allowanceDays))
+                .divide(allowancePolicy.getDenominator(), 2, RoundingMode.HALF_UP);
+        descList.add(descPrefix + "计算结果为" + maternityAllowance.toPlainString());
+        return maternityAllowance;
+    }
+
+    private BigDecimal getGovAllowance(AllowancePolicy allowancePolicy, List<String> descriptionList) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (Objects.nonNull(allowancePolicy.getGovAllowance())) {
+            result = allowancePolicy.getGovAllowance();
+        }
+        descriptionList.add("1.政府发放金额：" + result);
+        return result;
+    }
 
     /**
      * 计算法定产假
@@ -89,7 +190,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         LocalDate leaveStartDate = response.getLeaveEndDate();
         response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, statutoryPolicy.getLeaveDays(), statutoryPolicy.isCalendarDay()));
         response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-        response.getLeaveCalculateDetail().getDescriptionList().add("1.法定产假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+        response.getCalculateComments().getDescriptionList().add("1.法定产假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
     }
 
 
@@ -103,7 +204,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             LocalDate leaveStartDate = response.getLeaveEndDate();
             response.setLeaveEndDate(dateUtil.getEndDate(response.getLeaveEndDate(), rule.getLeaveDays(), dystociaPolicy.isCalendarDay()));
             response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-            response.getLeaveCalculateDetail().getDescriptionList().add("2.难产假 ("+ rule.getDescription() + ") 开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+            response.getCalculateComments().getDescriptionList().add("2.难产假 ("+ rule.getDescription() + ") 开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
         });
     }
 
@@ -114,7 +215,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         LocalDate leaveStartDate = response.getLeaveEndDate();
         response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, moreInfantPolicy.getLeaveDays() * request.getInfantNumber(), moreInfantPolicy.isCalendarDay()));
         response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-        response.getLeaveCalculateDetail().getDescriptionList().add("3.多胎假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+        response.getCalculateComments().getDescriptionList().add("3.多胎假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
     }
 
     /**
@@ -127,7 +228,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, otherExtendedPolicy.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
                     , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
             response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-            response.getLeaveCalculateDetail().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+            response.getCalculateComments().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
         } else {
             /*
              * 奖励假根据规则来计算
@@ -139,9 +240,9 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
                             , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
                     response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
                     if (StringUtils.isEmpty(rule.getDescription())) {
-                        response.getLeaveCalculateDetail().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+                        response.getCalculateComments().getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
                     } else {
-                        response.getLeaveCalculateDetail().getDescriptionList().add("4.奖励假 ("+ rule.getDescription() + ") ，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+                        response.getCalculateComments().getDescriptionList().add("4.奖励假 ("+ rule.getDescription() + ") ，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
                     }
                     break;
                 }
@@ -165,7 +266,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             var ectopicPregnancyRule = abortionRules.stream().filter(AbortionRule::isEctopicPregnancy).findFirst().get();
             response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, ectopicPregnancyRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
             response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-            response.getLeaveCalculateDetail().getDescriptionList().add("1.流产假（宫外孕），开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+            response.getCalculateComments().getDescriptionList().add("1.流产假（宫外孕），开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
         } else {
             /*
              * 按妊娠天数来计算
@@ -176,7 +277,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
                 var pregnancyRule = pregnancyRuleOpt.get();
                 response.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, pregnancyRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
                 response.setCurrentLeaveDays(response.getCurrentLeaveDays() + ChronoUnit.DAYS.between(leaveStartDate, response.getLeaveEndDate()));
-                response.getLeaveCalculateDetail().getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
+                response.getCalculateComments().getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + response.getLeaveEndDate());
             } else {
                 throw new RuntimeException("未找到合适的流产假规则");
             }
