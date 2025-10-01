@@ -11,4 +11,9 @@ public class AllowanceDetail {
 
     private BigDecimal compensation;
 
+    private BigDecimal firstMonthSalary;
+    private BigDecimal lastMonthSalary;
+    private BigDecimal otherMonthSalary;
+    private BigDecimal totalSalary;
+
 }

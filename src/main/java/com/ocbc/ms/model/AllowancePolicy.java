@@ -22,6 +22,11 @@ public class AllowancePolicy {
      * 津贴基数计算分母，大部分城市为30，成都为365，天津为30.4
      */
     private BigDecimal denominator;
+
+    /**
+     * 享受生育津贴天数
+     */
+    private int allowanceDays;
      /**
       * 目标账户类型，为企业/个人
       * 本系统仅记录，此字段不实际参与处理

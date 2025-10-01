@@ -1,9 +1,6 @@
 package com.ocbc.ms.service.impl;
 
-import com.ocbc.ms.dto.CalculateComments;
-import com.ocbc.ms.dto.DateCalculateRequest;
-import com.ocbc.ms.dto.MaternityLeaveCalculateResponse;
-import com.ocbc.ms.dto.MoneyCalculateRequest;
+import com.ocbc.ms.dto.*;
 import com.ocbc.ms.model.AllowancePolicy;
 import com.ocbc.ms.model.rule.AbortionRule;
 import com.ocbc.ms.model.MaternityLeaveDatePolicy;
@@ -99,7 +96,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
          */
         BigDecimal govAllowance = getGovAllowance(policy.getAllowancePolicy(), descList);
         BigDecimal maternityAllowance = getMaternityAllowance(policy.getAllowancePolicy(), descList, request);
-        BigDecimal salary = getSalary(policy.getAllowancePolicy(), descList, request);
+        BigDecimal salary = getSalary(descList, request, response.getAllowanceDetail());
 
         var compensation = getCompensation(govAllowance, maternityAllowance, salary);
         descList.add("4.需补差：" + compensation);
@@ -118,35 +115,58 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     /**
      * 
      */
-    private BigDecimal getSalary(AllowancePolicy allowancePolicy, List<String> descList, MoneyCalculateRequest request) {
+    private BigDecimal getSalary(List<String> descList, MoneyCalculateRequest request,
+                                 AllowanceDetail allowanceDetail) {
         var descPrefix = "3.产假期间工资计算: ";
         descList.add(descPrefix + "开始");
-
+        calculateFirstMonthSalary(descList, request, allowanceDetail);
+        calculateLastMonthSalary(descList, request, allowanceDetail);
+        calculateOtherMonthSalary(descList, request, allowanceDetail);
         return BigDecimal.ZERO;
     }
 
-    private int getTotalSalaryDays(LocalDate firstDayOfMonth, LocalDate lastDayOfMonth) {
-        if (firstDayOfMonth == null || lastDayOfMonth == null) {
-            return 0;
-        }
-        if (firstDayOfMonth.isAfter(lastDayOfMonth)) {
-            return 0;
-        }
-        int workdays = 0;
-        LocalDate date = firstDayOfMonth;
-        while (!date.isAfter(lastDayOfMonth)) { // inclusive
-            DayOfWeek dow = date.getDayOfWeek();
-            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
-                workdays++;
-            }
-            date = date.plusDays(1);
-        }
-        return workdays;
+    private void calculateFirstMonthSalary(List<String> descList, MoneyCalculateRequest request,
+                                           AllowanceDetail allowanceDetail) {
+        var descPrefix = "3.1 产假期间第一个月工资计算: ";
+        descList.add(descPrefix + "开始");
+        int initSalaryDays = dateUtil.getRealSalaryDays(dateUtil.getFirstDayOfMonth(request.getLeaveStartDate()), dateUtil.getLastDayOfMonth(request.getLeaveStartDate()),request.getCalendarCode());
+        descList.add(descPrefix + "初始计薪天数为" + initSalaryDays);
+        var dailySalary = request.getCurrentSalary().divide(new BigDecimal(initSalaryDays), 2, RoundingMode.HALF_UP);
+        descList.add(descPrefix + "每日工资为" + dailySalary.toPlainString());
+        int adjustDays = dateUtil.getRealSalaryDays(request.getLeaveStartDate(), dateUtil.getLastDayOfMonth(request.getLeaveStartDate()),request.getCalendarCode());
+        descList.add(descPrefix + "调整天数为" + adjustDays);
+        var firstMonthSalary = dailySalary.multiply(new BigDecimal(initSalaryDays - adjustDays));
+        descList.add(descPrefix + "第一个月工资为" + firstMonthSalary.toPlainString());
+        allowanceDetail.setFirstMonthSalary(firstMonthSalary);
     }
 
-    private int getRealSalaryDays(LocalDate realStartDate, LocalDate realEndDate) {
-        return (int) ChronoUnit.DAYS.between(realStartDate, realEndDate);
+    private void calculateLastMonthSalary(List<String> descList, MoneyCalculateRequest request,
+                                           AllowanceDetail allowanceDetail) {
+        var descPrefix = "3.2 产假期间最后一个月工资计算: ";
+        descList.add(descPrefix + "开始");
+        int initSalaryDays = dateUtil.getRealSalaryDays(dateUtil.getFirstDayOfMonth(request.getLeaveEndDate()), dateUtil.getLastDayOfMonth(request.getLeaveEndDate()),request.getCalendarCode());
+        descList.add(descPrefix + "初始计薪天数为" + initSalaryDays);
+        var dailySalary = request.getCurrentSalary().divide(new BigDecimal(initSalaryDays), 2, RoundingMode.HALF_UP);
+        descList.add(descPrefix + "每日工资为" + dailySalary.toPlainString());
+        int adjustDays = dateUtil.getRealSalaryDays(dateUtil.getFirstDayOfMonth(request.getLeaveEndDate()), request.getLeaveEndDate(), request.getCalendarCode());
+        descList.add(descPrefix + "调整天数为" + adjustDays);
+        var lastMonthSalary = dailySalary.multiply(new BigDecimal(initSalaryDays - adjustDays));
+        descList.add(descPrefix + "最后一个月工资为" + lastMonthSalary.toPlainString());
+        allowanceDetail.setLastMonthSalary(lastMonthSalary);
     }
+
+    private void calculateOtherMonthSalary(List<String> descList, MoneyCalculateRequest request,
+                                          AllowanceDetail allowanceDetail) {
+        var descPrefix = "3.3 产假期间其余月份工资计算: ";
+        descList.add(descPrefix + "开始");
+        descList.add(descPrefix + "产假开始日期为" + request.getLeaveStartDate() + " 产假结束日期为" + request.getLeaveEndDate());
+        int monthCount = dateUtil.getFullMonthCount(request.getLeaveStartDate(), request.getLeaveEndDate());
+        descList.add(descPrefix + "其中去除首月及尾月则完整月份数量为" + monthCount + " 员工当前工资为" + request.getCurrentSalary());
+        BigDecimal otherMonthSalary = request.getCurrentSalary().multiply(new BigDecimal(monthCount));
+        descList.add(descPrefix + "其他月份工资为" + otherMonthSalary.toPlainString());
+        allowanceDetail.setOtherMonthSalary(otherMonthSalary);
+    }
+
 
     /**
      * 
@@ -161,7 +181,8 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             log.error("Base salary not found");
             throw new RuntimeException("Base salary not found");
         }
-        var allowanceDays = ChronoUnit.DAYS.between(request.getLeaveStartDate(), request.getLeaveEndDate());
+//        var allowanceDays = ChronoUnit.DAYS.between(request.getLeaveStartDate(), request.getLeaveEndDate());
+        var allowanceDays = allowancePolicy.getAllowanceDays();
         descList.add(descPrefix + "津贴天数为" + allowanceDays);
         var baseSalary = baseSalaryOpt.get();
         descList.add(descPrefix + "公司月（缴费）平均工资为" + baseSalary.getCorpAverageSalary().toPlainString());

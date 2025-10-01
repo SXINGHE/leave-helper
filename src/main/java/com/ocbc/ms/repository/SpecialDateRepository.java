@@ -20,4 +20,16 @@ public interface SpecialDateRepository extends JpaRepository<SpecialDate, Long> 
     @Query("SELECT h FROM t_special_date h WHERE h.calendarCode = :calendarCode " +
             "AND h.year = :year AND h.isActive = true")
     List<SpecialDate> findByCalendarCodeAndYear(String calendarCode, Integer year);
+
+
+    @Query("SELECT h FROM t_special_date h WHERE h.calendarCode = :calendarCode " +
+            "AND h.calendarDate >= :startDate AND h.calendarDate <= :endDate " +
+            "And h.isWorkday = true AND h.isActive = true")
+    List<SpecialDate> findExtraWorkDaysByCalendarCodeAndYear(String calendarCode, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT h FROM t_special_date h WHERE h.calendarCode = :calendarCode " +
+            "AND h.calendarDate >= :startDate AND h.calendarDate <= :endDate " +
+            "And h.isWorkday = false AND h.isActive = true")
+    List<SpecialDate> findHolidayByCalendarCodeAndYear(String calendarCode, LocalDate startDate, LocalDate endDate);
+
 }

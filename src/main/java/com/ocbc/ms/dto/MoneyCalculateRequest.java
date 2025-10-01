@@ -26,6 +26,10 @@ public class MoneyCalculateRequest {
      * 过去12个月平均月薪
      */
     private BigDecimal averageSalary;
+    /**
+     * 当前月薪
+     */
+    private BigDecimal currentSalary;
 
     /**
      * when DifferenceCompensationRule.forceCompensation == other
