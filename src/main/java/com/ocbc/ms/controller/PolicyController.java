@@ -24,18 +24,34 @@ public class PolicyController {
     private PolicyRepository policyRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<Policy> createPolicy(@Valid @RequestBody PolicyCreateRequest request) {
+    public ResponseEntity<Policy> createPolicy(@RequestBody PolicyCreateRequest request) {
         try {
+            System.out.println("create policy");
+            Policy policy = getPolicy(request);
             // PolicyCreateRequest 继承自 Policy，可直接保存
-            Policy saved = policyRepository.save(request);
+            Policy saved = policyRepository.save(policy);
+            System.out.println("create policy successful");
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
+            System.out.println("create policy failed");
             return ResponseEntity.badRequest().build();
         }
     }
 
+    private static Policy getPolicy(PolicyCreateRequest request) {
+        Policy policy = new Policy();
+        policy.setCityName(request.getCityName());
+        policy.setStatutoryPolicy(request.getStatutoryPolicy());
+        policy.setDystociaPolicy(request.getDystociaPolicy());
+        policy.setMoreInfantPolicy(request.getMoreInfantPolicy());
+        policy.setOtherExtendedPolicy(request.getOtherExtendedPolicy());
+        policy.setAbortionPolicy(request.getAbortionPolicy());
+        policy.setAllowancePolicy(request.getAllowancePolicy());
+        return policy;
+    }
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<Policy> updatePolicy(@PathVariable Long id, @Valid @RequestBody PolicyUpdateRequest request) {
+    public ResponseEntity<Policy> updatePolicy(@PathVariable Long id, @RequestBody PolicyUpdateRequest request) {
         try {
             return policyRepository.findById(id)
                     .map(existing -> {

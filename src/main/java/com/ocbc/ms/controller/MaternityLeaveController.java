@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,13 +30,13 @@ public class MaternityLeaveController {
 
 
     @PostMapping("/calculateDate")
-    public ResponseEntity<CalculateResponse> calculateDate(DateCalculateRequest request) {
+    public ResponseEntity<CalculateResponse> calculateDate(@RequestBody DateCalculateRequest request) {
         return new ResponseEntity<>(maternityLeaveService.calculateDate(request), HttpStatus.OK);
     }
 
 
     @PostMapping("/calculateMoney")
-    public ResponseEntity<CalculateResponse> calculateMoney(MoneyCalculateRequest request) {
+    public ResponseEntity<CalculateResponse> calculateMoney(@RequestBody MoneyCalculateRequest request) {
         return new ResponseEntity<>(maternityLeaveService.calculateMoney(request), HttpStatus.OK);
     }
 }

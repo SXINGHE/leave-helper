@@ -8,15 +8,11 @@ import java.util.ArrayList;
 @Data
 public class CalculateResponse {
 
-    private LocalDate leaveEndDate;
-
     private AllowanceDetail allowanceDetail;
 
     private LeaveDetail leaveDetail;
 
     private CalculateComments calculateComments;
-
-    private long currentLeaveDays = 0L;
 
     public CalculateResponse() {
         this.calculateComments = new CalculateComments();

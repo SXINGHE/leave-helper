@@ -8,6 +8,7 @@ import com.ocbc.ms.dto.rule.OtherExtendedRule;
 import com.ocbc.ms.repository.PolicyRepository;
 import com.ocbc.ms.service.MaternityLeaveService;
 import com.ocbc.ms.util.CalculateDateUtil;
+import com.ocbc.ms.util.CalculateMoneyUtil;
 import com.ocbc.ms.util.DateUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,8 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     DateUtil dateUtil;
     @Resource
     CalculateDateUtil calculateDateUtil;
+    @Resource
+    CalculateMoneyUtil calculateMoneyUtil;
 
     /**
      * 
@@ -43,45 +46,52 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     @Override
     public CalculateResponse calculateDate(DateCalculateRequest request) {
         CalculateResponse response = new CalculateResponse();
-        var leaveDetail = response.getLeaveDetail();
-        leaveDetail.setLeaveStartDate(request.getLeaveStartDate());
-        leaveDetail.setLeaveEndDate(request.getLeaveStartDate());
-        var calculateComments = response.getCalculateComments();
 
-        var policyOpt = policyRepository.findByCityName(request.getCityName());
+        try {
+            var leaveDetail = response.getLeaveDetail();
+            leaveDetail.setLeaveStartDate(request.getLeaveStartDate());
+            leaveDetail.setLeaveEndDate(request.getLeaveStartDate());
+            var calculateComments = response.getCalculateComments();
 
-        if (policyOpt.isEmpty()) {
-            throw new RuntimeException("Policy not found");
+            var policyOpt = policyRepository.findByCityName(request.getCityName());
+
+            if (policyOpt.isEmpty()) {
+                throw new RuntimeException("Policy not found");
+            }
+
+            calculateComments.getDescriptionList().add("假期计算开始");
+
+            var policy = policyOpt.get();
+
+            if (request.isAbortion()) {
+                calculateComments.getDescriptionList().add("进入计算流产假流程");
+                /*
+                    计算流产假
+                 */
+                calculateDateUtil.calculateAbortionLeave(request, leaveDetail, calculateComments,policy.getAbortionPolicy());
+            } else {
+                calculateComments.getDescriptionList().add("进入计算产假流程");
+                /*
+                    按顺序计算产假
+                 */
+                calculateDateUtil.calculateStatutoryLeave(leaveDetail, calculateComments, policy.getStatutoryPolicy());
+                if (request.isDystocia()) {
+                    calculateDateUtil.calculateDystociaLeave(request, leaveDetail, calculateComments, policy.getDystociaPolicy());
+                } else {
+                    calculateComments.getDescriptionList().add("2.难产假: 无");
+                }
+                if (request.getInfantNumber() > 1) {
+                    calculateDateUtil.calculateMoreInfantLeave(request, leaveDetail, calculateComments, policy.getMoreInfantPolicy());
+                } else {
+                    calculateComments.getDescriptionList().add("3.多胎假: 无");
+                }
+                calculateDateUtil.calculateOtherExtendedLeave(request, leaveDetail, calculateComments, policy.getOtherExtendedPolicy());
+            }
+        }catch (Exception e){
+            log.error("MaternityLeaveServiceImpl calculateDate error", e);
+            throw new RuntimeException("MaternityLeaveServiceImpl calculateDate error", e);
         }
 
-        calculateComments.getDescriptionList().add("假期计算开始");
-
-        var policy = policyOpt.get();
-
-        if (request.isAbortion()) {
-            calculateComments.getDescriptionList().add("进入计算流产假流程");
-            /*
-                计算流产假
-             */
-            calculateDateUtil.calculateAbortionLeave(request, leaveDetail, calculateComments,policy.getAbortionPolicy());
-        } else {
-            calculateComments.getDescriptionList().add("进入计算产假流程");
-            /*
-                按顺序计算产假
-             */
-            calculateDateUtil.calculateStatutoryLeave(leaveDetail, calculateComments, policy.getStatutoryPolicy());
-            if (!CollectionUtils.isEmpty(request.getDystociaCodeList())) {
-                calculateDateUtil.calculateDystociaLeave(request, leaveDetail, calculateComments, policy.getDystociaPolicy());
-            } else {
-                calculateComments.getDescriptionList().add("2.难产假: 无");
-            }
-            if (request.getInfantNumber() >= 1) {
-                calculateDateUtil.calculateMoreInfantLeave(request, leaveDetail, calculateComments, policy.getMoreInfantPolicy());
-            } else {
-                calculateComments.getDescriptionList().add("3.多胎假: 无");
-            }
-            calculateDateUtil.calculateOtherExtendedLeave(request, leaveDetail, calculateComments, policy.getOtherExtendedPolicy());
-        }
         return response;
     }
 

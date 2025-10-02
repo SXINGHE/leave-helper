@@ -8,6 +8,10 @@ import java.util.List;
 @Data
 public class DystociaLeavePolicy extends LeavePolicy{
 
+    /**
+     * 标准难产假天数
+     */
+    private int standardLeaveDays;
 
     /**
      * 难产假特殊规则

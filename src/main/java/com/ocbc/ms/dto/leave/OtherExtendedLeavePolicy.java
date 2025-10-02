@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class OtherExtendedLeavePolicy extends LeavePolicy {
 
-    private int leaveDays;
+    private int standardLeaveDays;
 
     private List<OtherExtendedRule> otherExtendedRules;
 }

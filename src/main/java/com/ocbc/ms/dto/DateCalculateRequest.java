@@ -31,6 +31,8 @@ public class DateCalculateRequest {
      */
     private boolean abortion;
 
+    private boolean dystocia;
+
     /**
      * drop down list
      */
@@ -59,6 +61,11 @@ public class DateCalculateRequest {
      * Guang Zhou 难产（剖腹产、会阴Ⅲ度破裂）另加30天；吸引产、钳产、臀位牵引产另加15天；
      */
     private List<String> dystociaCodeList;
+     /**
+     * 其他产假计算参数
+     * 默认为空
+     */
+    private List<String> extendedCodeList;
 
 
 }
