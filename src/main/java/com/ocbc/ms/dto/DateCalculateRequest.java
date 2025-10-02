@@ -14,23 +14,11 @@ public class DateCalculateRequest {
     @Schema(description = "Staff name", example = "Zhang San")
     private String staffName;
     /**
-     * yyyyMMdd
-     */
-    @Schema(description = "Child birth date in yyyyMMdd format", example = "20240315")
-    private String childBirthdate;
-
-    /**
      * 胎儿数量
      * 默认为1
      */
     @Schema(description = "Number of infants", example = "1", defaultValue = "1")
     private int infantNumber = 1;
-    /**
-     * 第几胎？
-     * 默认为1
-     */
-    @Schema(description = "Delivery sequence number", example = "1", defaultValue = "1")
-    private int deliverySequence = 1;
 
     /**
      * 是否流产？
@@ -59,16 +47,6 @@ public class DateCalculateRequest {
 
     @Schema(description = "Calendar code", example = "CN")
     private String calendarCode;
-
-    /**
-     * 流产假计算参数
-     */
-    @Schema(description = "Pregnancy days for abortion leave calculation", example = "90")
-    private int regnancyDays;
-    @Schema(description = "Is ectopic pregnancy", example = "false")
-    private boolean ectopicPregnancy;
-    @Schema(description = "Recommended abortion leave days", example = "15")
-    private int recommendAbortionLeaveDays;
 
     /**
      * 难产假计算参数

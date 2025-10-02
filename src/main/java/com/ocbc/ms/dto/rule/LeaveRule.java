@@ -3,6 +3,8 @@ package com.ocbc.ms.dto.rule;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 @Schema(description = "产假规则数据")
 public class LeaveRule {
@@ -13,5 +15,9 @@ public class LeaveRule {
     private String ruleCode;
     @Schema(description = "规则描述", example = "吸引产、钳产、臀位牵引产另加15天/妊娠满4个月流产，42天")
     private String description;
+
+    public LeaveRule() {
+        this.ruleCode = UUID.randomUUID().toString();
+    }
 
 }
