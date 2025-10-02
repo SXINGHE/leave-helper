@@ -1,4 +1,4 @@
-package com.ocbc.ms.model;
+package com.ocbc.ms.dto.allowance;
 
 import lombok.Data;
 

@@ -10,4 +10,7 @@ public class LeaveDetail {
     private LocalDate leaveStartDate;
 
     private LocalDate leaveEndDate;
+
+    private Integer currentLeaveDays = 0;
+
 }

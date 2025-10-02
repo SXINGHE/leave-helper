@@ -1,4 +1,4 @@
-package com.ocbc.ms.model.rule;
+package com.ocbc.ms.dto.rule;
 
 import lombok.Data;
 
@@ -6,6 +6,9 @@ import lombok.Data;
 public class DystociaRule {
 
     private int leaveDays;
+    /*
+     *  难产假特殊规则代码
+     */
     private String dystociaCode;
     /*
      *  默认

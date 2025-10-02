@@ -1,7 +1,7 @@
 package com.ocbc.ms.entity;
 
-import com.ocbc.ms.model.AllowancePolicy;
-import com.ocbc.ms.model.MaternityLeaveDatePolicy;
+import com.ocbc.ms.dto.allowance.AllowancePolicy;
+import com.ocbc.ms.dto.leave.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,23 +28,23 @@ public class Policy {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "statutory_policy", columnDefinition = "jsonb")
-    private MaternityLeaveDatePolicy statutoryPolicy;
+    private StatutoryLeavePolicy statutoryPolicy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "dystocia_policy", columnDefinition = "jsonb")
-    private MaternityLeaveDatePolicy dystociaPolicy;
+    private DystociaLeavePolicy dystociaPolicy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "more_infant_policy", columnDefinition = "jsonb")
-    private MaternityLeaveDatePolicy moreInfantPolicy;
+    private MoreInfantLeavePolicy moreInfantPolicy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "other_extended_policy", columnDefinition = "jsonb")
-    private MaternityLeaveDatePolicy otherExtendedPolicy;
+    private OtherExtendedLeavePolicy otherExtendedPolicy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "abortion_policy", columnDefinition = "jsonb")
-    private MaternityLeaveDatePolicy abortionPolicy;
+    private AbortionLeavePolicy abortionPolicy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "allowance_policy", columnDefinition = "jsonb")

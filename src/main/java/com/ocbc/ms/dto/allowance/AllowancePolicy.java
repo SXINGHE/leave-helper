@@ -1,7 +1,7 @@
-package com.ocbc.ms.model;
+package com.ocbc.ms.dto.allowance;
 
 
-import com.ocbc.ms.model.rule.DifferenceCompensationRule;
+import com.ocbc.ms.dto.rule.DifferenceCompensationRule;
 import lombok.Data;
 
 import java.math.BigDecimal;

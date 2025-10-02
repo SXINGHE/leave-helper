@@ -1,4 +1,4 @@
-package com.ocbc.ms.model.rule;
+package com.ocbc.ms.dto.rule;
 
 import lombok.Data;
 

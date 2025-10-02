@@ -2,7 +2,7 @@ package com.ocbc.ms.controller;
 
 
 import com.ocbc.ms.dto.DateCalculateRequest;
-import com.ocbc.ms.dto.MaternityLeaveCalculateResponse;
+import com.ocbc.ms.dto.CalculateResponse;
 import com.ocbc.ms.dto.MoneyCalculateRequest;
 import com.ocbc.ms.service.MaternityLeaveService;
 import jakarta.annotation.Resource;
@@ -29,13 +29,13 @@ public class MaternityLeaveController {
 
 
     @PostMapping("/calculateDate")
-    public ResponseEntity<MaternityLeaveCalculateResponse> calculateDate(DateCalculateRequest request) {
+    public ResponseEntity<CalculateResponse> calculateDate(DateCalculateRequest request) {
         return new ResponseEntity<>(maternityLeaveService.calculateDate(request), HttpStatus.OK);
     }
 
 
     @PostMapping("/calculateMoney")
-    public ResponseEntity<MaternityLeaveCalculateResponse> calculateMoney(MoneyCalculateRequest request) {
+    public ResponseEntity<CalculateResponse> calculateMoney(MoneyCalculateRequest request) {
         return new ResponseEntity<>(maternityLeaveService.calculateMoney(request), HttpStatus.OK);
     }
 }

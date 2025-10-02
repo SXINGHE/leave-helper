@@ -1,14 +1,12 @@
 package com.ocbc.ms.dto;
 
-import com.ocbc.ms.model.MaternityLeaveDatePolicy;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Data
-public class MaternityLeaveCalculateResponse {
+public class CalculateResponse {
 
     private LocalDate leaveEndDate;
 
@@ -20,7 +18,7 @@ public class MaternityLeaveCalculateResponse {
 
     private long currentLeaveDays = 0L;
 
-    public MaternityLeaveCalculateResponse() {
+    public CalculateResponse() {
         this.calculateComments = new CalculateComments();
         this.calculateComments.setDescriptionList(new ArrayList<>());
         this.allowanceDetail = new AllowanceDetail();
