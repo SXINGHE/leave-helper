@@ -1,7 +1,16 @@
 package com.ocbc.ms.controller;
 
 
+import com.ocbc.ms.dto.CalculateResponse;
+import com.ocbc.ms.dto.MoneyCalculateRequest;
+import com.ocbc.ms.dto.policy.PolicyDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +24,7 @@ import com.ocbc.ms.dto.policy.PolicyUpdateRequest;
 
 import jakarta.validation.Valid;
 
+@Tag(name = "Policy", description = "Maternity leave policy management APIs")
 @RestController
 @RequestMapping("/api/v1/policy")
 @RequiredArgsConstructor
@@ -23,6 +33,11 @@ public class PolicyController {
     @Autowired
     private PolicyRepository policyRepository;
 
+    @Operation(summary = "Create new policy", description = "Create a new maternity leave policy for a city")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully created policy"),
+        @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/create")
     public ResponseEntity<Policy> createPolicy(@RequestBody PolicyCreateRequest request) {
         try {
@@ -50,8 +65,16 @@ public class PolicyController {
         return policy;
     }
 
+    @Operation(summary = "Update existing policy", description = "Update maternity leave policy by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated policy"),
+        @ApiResponse(responseCode = "404", description = "Policy not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/update/{id}")
-    public ResponseEntity<Policy> updatePolicy(@PathVariable Long id, @RequestBody PolicyUpdateRequest request) {
+    public ResponseEntity<Policy> updatePolicy(
+            @Parameter(description = "Policy ID") @PathVariable Long id, 
+            @RequestBody PolicyUpdateRequest request) {
         try {
             return policyRepository.findById(id)
                     .map(existing -> {
@@ -71,4 +94,26 @@ public class PolicyController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @Operation(summary = "Fetch policy by city name", description = "政策配置页面需要，产假计算页面同样需要call此接口获取可能的特殊参数")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully get policy"),
+            @ApiResponse(responseCode = "404", description = "Policy not found"),
+    })
+    @GetMapping("/fetch")
+    public ResponseEntity<PolicyDto> policyFetch(@RequestParam("cityName") String cityName) {
+        Policy policy = policyRepository.findByCityName(cityName).orElse(null);
+        PolicyDto policyDto = new PolicyDto();
+        policyDto.setId(policy.getId());
+        policyDto.setCityName(policy.getCityName());
+        policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
+        policyDto.setDystociaPolicy(policy.getDystociaPolicy());
+        policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());
+        policyDto.setOtherExtendedPolicy(policy.getOtherExtendedPolicy());
+        policyDto.setAbortionPolicy(policy.getAbortionPolicy());
+        policyDto.setAllowancePolicy(policy.getAllowancePolicy());
+        return new ResponseEntity<>(policyDto, HttpStatus.OK);
+    }
+
+
 }

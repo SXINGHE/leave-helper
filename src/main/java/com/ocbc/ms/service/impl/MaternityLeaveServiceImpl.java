@@ -3,8 +3,6 @@ package com.ocbc.ms.service.impl;
 import com.ocbc.ms.dto.*;
 import com.ocbc.ms.dto.allowance.AllowancePolicy;
 import com.ocbc.ms.dto.leave.*;
-import com.ocbc.ms.dto.rule.AbortionRule;
-import com.ocbc.ms.dto.rule.OtherExtendedRule;
 import com.ocbc.ms.repository.PolicyRepository;
 import com.ocbc.ms.service.MaternityLeaveService;
 import com.ocbc.ms.util.CalculateDateUtil;

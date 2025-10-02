@@ -2,12 +2,14 @@ package com.ocbc.ms.dto.allowance;
 
 
 import com.ocbc.ms.dto.rule.DifferenceCompensationRule;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
+@Schema
 public class AllowancePolicy {
 
     /**

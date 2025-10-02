@@ -1,10 +1,12 @@
 package com.ocbc.ms.dto.rule;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Schema
 public class DifferenceCompensationRule {
 
 

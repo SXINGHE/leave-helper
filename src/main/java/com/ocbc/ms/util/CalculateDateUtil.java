@@ -1,12 +1,9 @@
 package com.ocbc.ms.util;
 
 import com.ocbc.ms.dto.CalculateComments;
-import com.ocbc.ms.dto.CalculateResponse;
 import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.LeaveDetail;
 import com.ocbc.ms.dto.leave.*;
-import com.ocbc.ms.dto.rule.AbortionRule;
-import com.ocbc.ms.dto.rule.OtherExtendedRule;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +12,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.Objects;
 
 @Component
 public class CalculateDateUtil {
@@ -54,7 +52,7 @@ public class CalculateDateUtil {
             calculateComments.getDescriptionList().add("2.难产假天数" + dystociaPolicy.getStandardLeaveDays());
             calculateComments.getDescriptionList().add("2.难产假 (标准难产假) 开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
         } else {
-            var dystociaRules = dystociaPolicy.getDystociaRules().stream().filter(rule -> request.getDystociaCodeList().contains(rule.getDystociaCode())).toList();
+            var dystociaRules = dystociaPolicy.getDystociaRules().stream().filter(rule -> request.getDystociaCodeList().contains(rule.getRuleCode())).toList();
             dystociaRules.forEach(rule -> {
                 LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
                 leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveDetail.getLeaveEndDate(), rule.getLeaveDays(), dystociaPolicy.isCalendarDay()));
@@ -87,30 +85,24 @@ public class CalculateDateUtil {
      */
     public void calculateAbortionLeave(DateCalculateRequest request, LeaveDetail leaveDetail, CalculateComments calculateComments,
                                         AbortionLeavePolicy abortionPolicy) {
-        var abortionRules = abortionPolicy.getAbortionRules();
         LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
-        if (request.isEctopicPregnancy() && abortionRules.stream().anyMatch(AbortionRule::isEctopicPregnancy)) {
-            /*
-             * 宫外孕计算优先级最高
-             */
-            var ectopicPregnancyRule = abortionRules.stream().filter(AbortionRule::isEctopicPregnancy).findFirst().get();
-            leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, ectopicPregnancyRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
+        var abortionRuleOpt = abortionPolicy.getAbortionRules().stream()
+                .filter(rule -> request.getAbortionCode().equalsIgnoreCase(rule.getRuleCode())).findFirst();
+        if (abortionRuleOpt.isPresent()) {
+            var abortionRule = abortionRuleOpt.get();
+            leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, abortionRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
             updateCurrentLeaveDays(leaveDetail, leaveStartDate);
-            calculateComments.getDescriptionList().add("1.流产假（宫外孕），开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
-        } else {
-            /*
-             * 按妊娠天数来计算
-             */
-            var pregnancyRuleOpt = abortionRules.stream().filter(rule -> request.getRegnancyDays() >= rule.getMinRegnancyDays() && request.getRegnancyDays() <= rule.getMaxRegnancyDays())
-                    .findFirst();
-            if (pregnancyRuleOpt.isPresent()) {
-                var pregnancyRule = pregnancyRuleOpt.get();
-                leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, pregnancyRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
-                updateCurrentLeaveDays(leaveDetail, leaveStartDate);
-                calculateComments.getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
+            calculateComments.getDescriptionList().add("1.流产假，找到流产假规则" + abortionRule.getDescription());
+            Integer leaveDays = null;
+            if (Objects.isNull(abortionRule.getLeaveDays())) {
+                leaveDays = request.getDynamicLeaveDaysMap().get(abortionRule.getRuleCode());
             } else {
-                throw new RuntimeException("未找到适用于本次请求的流产假规则");
+                leaveDays = abortionRule.getLeaveDays();
             }
+            calculateComments.getDescriptionList().add("1.流产假，假期天数为" + leaveDays);
+            calculateComments.getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
+        } else {
+            calculateComments.getDescriptionList().add("1.流产假，未找到适用于本次请求的流产假规则");
         }
     }
 
@@ -120,7 +112,7 @@ public class CalculateDateUtil {
      */
     public void calculateOtherExtendedLeave(DateCalculateRequest request, LeaveDetail leaveDetail, CalculateComments calculateComments, OtherExtendedLeavePolicy otherExtendedPolicy) {
         LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
-        if(CollectionUtils.isEmpty(request.getExtendedCodeList())) {
+        if(StringUtils.isEmpty(request.getExtendedCode()) || CollectionUtils.isEmpty(otherExtendedPolicy.getOtherExtendedRules())) {
             leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, otherExtendedPolicy.getStandardLeaveDays(), otherExtendedPolicy.isCalendarDay()
                     , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
             updateCurrentLeaveDays(leaveDetail, leaveStartDate);
@@ -129,19 +121,21 @@ public class CalculateDateUtil {
             /*
              * 奖励假根据规则来计算
              */
-            var sortedRules = otherExtendedPolicy.getOtherExtendedRules().stream().sorted(Comparator.comparingInt(OtherExtendedRule::getMinDeliverySequence)).toList();
-            for (OtherExtendedRule rule : sortedRules) {
-                if (request.getDeliverySequence() >= rule.getMinDeliverySequence()) {
-                    leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, rule.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
-                            , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
-                    updateCurrentLeaveDays(leaveDetail, leaveStartDate);
-                    if (StringUtils.isEmpty(rule.getDescription())) {
-                        calculateComments.getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
-                    } else {
-                        calculateComments.getDescriptionList().add("4.奖励假 ("+ rule.getDescription() + ") ，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
-                    }
-                    break;
+            var extendedRuleOpt = otherExtendedPolicy.getOtherExtendedRules()
+                    .stream().filter(rule -> request.getExtendedCode().equalsIgnoreCase(rule.getRuleCode()))
+                    .findFirst();
+            if (extendedRuleOpt.isPresent()) {
+                var extendedRule = extendedRuleOpt.get();
+                leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, extendedRule.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
+                        , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
+                updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+                if (StringUtils.isEmpty(extendedRule.getDescription())) {
+                    calculateComments.getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
+                } else {
+                    calculateComments.getDescriptionList().add("4.奖励假 ("+ extendedRule.getDescription() + ") ，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
                 }
+            } else {
+            calculateComments.getDescriptionList().add("4.奖励假，未找到适用于本次请求的奖励假规则");
             }
         }
     }
