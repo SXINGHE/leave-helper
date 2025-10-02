@@ -123,10 +123,13 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         } else {
             descList.add("4.根据政策要求，此次产假津贴无需补差");
         }
-        return null;
+        return response;
     }
 
     private BigDecimal getCompensation(BigDecimal govAllowance, BigDecimal maternityAllowance, BigDecimal salary) {
+        if (salary.compareTo(govAllowance) >= 0 && salary.compareTo(maternityAllowance) >= 0) {
+            return BigDecimal.ZERO;
+        }
         if (govAllowance.compareTo(maternityAllowance) >= 0) {
             return govAllowance.subtract(salary);
         } else {
