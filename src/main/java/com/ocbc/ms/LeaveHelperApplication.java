@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EntityScan(basePackages = {
-        "com.ocbc.ms.entity"         // 实体类扫描路径
+        "com.ocbc.ms.hrtools.model",        // HR Tools entities
+        "com.ocbc.ms.entity"                 // Other entities
 })
 @EnableJpaRepositories(basePackages = {
-        "com.ocbc.ms.repository"     // Repository 扫描路径
+        "com.ocbc.ms.hrtools.repository",   // HR Tools repositories
+        "com.ocbc.ms.repository"            // Other repositories
 })
 public class LeaveHelperApplication {
 
