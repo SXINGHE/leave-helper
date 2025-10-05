@@ -5,12 +5,13 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthProvider from './context/AuthProvider';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Profile from './pages/profile/Profile';
-import TeamManagement from './pages/team/TeamManagement';
-import LeaveRequest from './pages/leave/LeaveRequest';
+import TicketsPage from './pages/tickets';
+import TicketList from './pages/tickets/TicketList';
+import CreateTicketForm from './pages/tickets/CreateTicketForm';
 import './App.css';
 
 // Create a client
@@ -37,9 +38,12 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
-            <Route path="leave" element={<LeaveRequest />} />
-            <Route path="team" element={<TeamManagement />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="tickets" element={<TicketsPage />}>
+              <Route index element={<TicketList />} />
+              <Route path="create" element={<CreateTicketForm />} />
+              <Route path="pending" element={<TicketList showAllPending />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
           {/* Error Pages */}
