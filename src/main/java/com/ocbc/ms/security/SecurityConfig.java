@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-// @EnableMethodSecurity - Temporarily disabled to allow public endpoints
 public class SecurityConfig {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -59,10 +58,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers("/auth/signin").permitAll();
-                auth.requestMatchers("/auth/signup").permitAll();
-                auth.requestMatchers("/test/**").permitAll();
-                auth.anyRequest().authenticated();
+                auth.requestMatchers("/auth/signin","/auth/signup","/test/**").permitAll();
+//                auth.anyRequest().authenticated();
+                auth.anyRequest().permitAll();
             })
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exception -> 

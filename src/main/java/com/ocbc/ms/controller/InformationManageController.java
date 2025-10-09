@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
  * CRUD for city/company/policy
  */
 @RestController
-@RequestMapping("/api/v1/info-manage")
+@RequestMapping("/v1/info-manage")
 @RequiredArgsConstructor
 public class InformationManageController {
 

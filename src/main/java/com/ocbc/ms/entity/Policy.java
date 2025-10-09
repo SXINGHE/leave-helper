@@ -1,5 +1,6 @@
 package com.ocbc.ms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ocbc.ms.dto.allowance.AllowancePolicy;
 import com.ocbc.ms.dto.leave.*;
 import jakarta.persistence.*;
@@ -17,6 +18,7 @@ import jakarta.persistence.Column;
 @Table(name = "t_policy")
 @Data
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Policy {
 
     @Id

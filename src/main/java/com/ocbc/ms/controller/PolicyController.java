@@ -26,7 +26,7 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Policy", description = "Maternity leave policy management APIs")
 @RestController
-@RequestMapping("/api/v1/policy")
+@RequestMapping("/v1/policy")
 @RequiredArgsConstructor
 public class PolicyController {
  

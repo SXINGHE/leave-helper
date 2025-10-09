@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Tag(name = "Calendar", description = "Calendar and special dates management APIs")
 @RestController
-@RequestMapping("/api/v1/calendar")
+@RequestMapping("/v1/calendar")
 @RequiredArgsConstructor
 public class CalendarController {
 

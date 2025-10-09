@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * dashboard page
  */
 @RestController
-@RequestMapping("/api/v1/dashboard")
+@RequestMapping("/v1/dashboard")
 @RequiredArgsConstructor
 public class DashboardController {
 }

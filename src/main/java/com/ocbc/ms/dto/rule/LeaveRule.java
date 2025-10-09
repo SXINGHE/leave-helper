@@ -1,5 +1,7 @@
 package com.ocbc.ms.dto.rule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -7,6 +9,7 @@ import java.util.UUID;
 
 @Data
 @Schema(description = "产假规则数据")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LeaveRule {
 
     @Schema(description = "规则命中时假期天数,如未可变值则此值设空，前端识别此值没空时应根据其描述给出输入框", example = "15")

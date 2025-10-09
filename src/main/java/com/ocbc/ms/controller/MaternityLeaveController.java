@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = "Maternity Leave", description = "Maternity leave calculation APIs")
 @RestController
-@RequestMapping("/api/v1/maternity-leave")
+@RequestMapping("/v1/maternity-leave")
 @RequiredArgsConstructor
 public class MaternityLeaveController {
 
