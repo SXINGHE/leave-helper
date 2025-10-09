@@ -1,34 +1,54 @@
 package com.ocbc.ms.entity;
 
+import com.ocbc.ms.dto.allowance.AllowancePolicy;
+import com.ocbc.ms.dto.leave.*;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcTypeCode;
+import jakarta.persistence.Column;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * we should find policy by city name and Company name
  */
+@Entity
+@Table(name = "t_policy")
 @Data
-//@Entity
+@NoArgsConstructor
 public class Policy {
 
-//    @Id
-    private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "city_name")
     private String cityName;
-    private String corpName;
 
-    private BigDecimal averageCitySalary;
-    private BigDecimal averageCorpSalary;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "statutory_policy", columnDefinition = "jsonb")
+    private StatutoryLeavePolicy statutoryPolicy;
 
-    /**
-     * jsonb
-     */
-    private List<LeaveRules> rulesList;
-    /**
-     * jsonb
-     */
-    private AllowanceRules allowanceRules;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "dystocia_policy", columnDefinition = "jsonb")
+    private DystociaLeavePolicy dystociaPolicy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "more_infant_policy", columnDefinition = "jsonb")
+    private MoreInfantLeavePolicy moreInfantPolicy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "other_extended_policy", columnDefinition = "jsonb")
+    private OtherExtendedLeavePolicy otherExtendedPolicy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "abortion_policy", columnDefinition = "jsonb")
+    private AbortionLeavePolicy abortionPolicy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "allowance_policy", columnDefinition = "jsonb")
+    private AllowancePolicy allowancePolicy;
+
 
 }

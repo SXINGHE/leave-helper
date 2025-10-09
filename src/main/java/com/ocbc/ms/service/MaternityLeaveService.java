@@ -1,9 +1,15 @@
 package com.ocbc.ms.service;
 
-import com.ocbc.ms.model.MaternityLeaveCalculateRequest;
-import com.ocbc.ms.model.MaternityLeaveCalculateResponse;
+import com.ocbc.ms.dto.DateCalculateRequest;
+import com.ocbc.ms.dto.CalculateResponse;
+import com.ocbc.ms.dto.MoneyCalculateRequest;
 
 public interface MaternityLeaveService {
 
-    MaternityLeaveCalculateResponse calculateMaternityLeave(MaternityLeaveCalculateRequest maternityLeaveCalculateRequest);
+
+
+    CalculateResponse calculateDate(DateCalculateRequest dateCalculateRequest);
+
+
+    CalculateResponse calculateMoney(MoneyCalculateRequest moneyCalculateRequest);
 }
