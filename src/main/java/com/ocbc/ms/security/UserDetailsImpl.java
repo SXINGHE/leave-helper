@@ -1,13 +1,11 @@
-package com.ocbc.ms.hrtools.security;
+package com.ocbc.ms.security;
 
-import com.ocbc.ms.hrtools.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ocbc.ms.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

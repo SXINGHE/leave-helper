@@ -1,7 +1,6 @@
-package com.ocbc.ms.hrtools.security;
+package com.ocbc.ms.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

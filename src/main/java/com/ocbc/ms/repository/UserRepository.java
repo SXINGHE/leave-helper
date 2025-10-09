@@ -1,6 +1,6 @@
-package com.ocbc.ms.hrtools.repository;
+package com.ocbc.ms.repository;
 
-import com.ocbc.ms.hrtools.model.User;
+import com.ocbc.ms.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

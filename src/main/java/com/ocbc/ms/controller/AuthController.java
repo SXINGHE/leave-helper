@@ -1,14 +1,14 @@
-package com.ocbc.ms.hrtools.controller;
+package com.ocbc.ms.controller;
 
-import com.ocbc.ms.hrtools.model.User;
-import com.ocbc.ms.hrtools.model.UserRole;
-import com.ocbc.ms.hrtools.payload.request.LoginRequest;
-import com.ocbc.ms.hrtools.payload.request.SignupRequest;
-import com.ocbc.ms.hrtools.payload.response.JwtResponse;
-import com.ocbc.ms.hrtools.payload.response.MessageResponse;
-import com.ocbc.ms.hrtools.repository.UserRepository;
-import com.ocbc.ms.hrtools.security.JwtUtils;
-import com.ocbc.ms.hrtools.security.UserDetailsImpl;
+import com.ocbc.ms.entity.User;
+import com.ocbc.ms.constant.UserRole;
+import com.ocbc.ms.dto.access.LoginRequest;
+import com.ocbc.ms.dto.access.SignupRequest;
+import com.ocbc.ms.dto.access.JwtResponse;
+import com.ocbc.ms.dto.access.MessageResponse;
+import com.ocbc.ms.repository.UserRepository;
+import com.ocbc.ms.security.JwtUtils;
+import com.ocbc.ms.security.UserDetailsImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;

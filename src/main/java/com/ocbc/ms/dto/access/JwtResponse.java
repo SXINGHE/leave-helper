@@ -1,4 +1,4 @@
-package com.ocbc.ms.hrtools.payload.response;
+package com.ocbc.ms.dto.access;
 
 import java.util.List;
 

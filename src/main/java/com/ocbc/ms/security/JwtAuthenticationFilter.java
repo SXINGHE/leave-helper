@@ -1,4 +1,4 @@
-package com.ocbc.ms.hrtools.security;
+package com.ocbc.ms.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

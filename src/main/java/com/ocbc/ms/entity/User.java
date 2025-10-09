@@ -1,5 +1,6 @@
-package com.ocbc.ms.hrtools.model;
+package com.ocbc.ms.entity;
 
+import com.ocbc.ms.constant.UserRole;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,4 +1,4 @@
-package com.ocbc.ms.hrtools.model;
+package com.ocbc.ms.constant;
 
 import org.springframework.security.core.GrantedAuthority;
 

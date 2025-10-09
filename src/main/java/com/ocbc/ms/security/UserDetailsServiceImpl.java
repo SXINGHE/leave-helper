@@ -1,7 +1,7 @@
-package com.ocbc.ms.hrtools.security;
+package com.ocbc.ms.security;
 
-import com.ocbc.ms.hrtools.model.User;
-import com.ocbc.ms.hrtools.repository.UserRepository;
+import com.ocbc.ms.entity.User;
+import com.ocbc.ms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
