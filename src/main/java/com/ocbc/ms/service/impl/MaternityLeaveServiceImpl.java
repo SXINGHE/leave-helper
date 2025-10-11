@@ -114,7 +114,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         BigDecimal maternityAllowance = getMaternityAllowance(policy.getAllowancePolicy(), descList, request);
         BigDecimal salary = getSalary(descList, request, response.getAllowanceDetail());
         if ("Yes".equals(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
-            || ("Other".equalsIgnoreCase(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
+            || ("Only if".equalsIgnoreCase(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
                     && request.isHitForceCompensationRule())) {
             var compensation = getCompensation(govAllowance, maternityAllowance, salary);
             descList.add("4.需补差：" + compensation);
@@ -209,7 +209,25 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             throw new RuntimeException("Base salary not found");
         }
 //        var allowanceDays = ChronoUnit.DAYS.between(request.getLeaveStartDate(), request.getLeaveEndDate());
-        var allowanceDays = allowancePolicy.getAllowanceDays();
+        /*
+        TODO
+         */
+        int allowanceDays = 0;
+        if (!CollectionUtils.isEmpty(allowancePolicy.getAllowanceDaysRule())) {
+            if (allowancePolicy.getAllowanceDaysRule().contains("statutory")) {
+                allowanceDays = request.getLeaveDetail().getStatutoryLeaveDays();
+            }
+            if (allowancePolicy.getAllowanceDaysRule().contains("dystocia")) {
+                allowanceDays = allowanceDays + request.getLeaveDetail().getDystociaLeaveDays();
+            }
+            if (allowancePolicy.getAllowanceDaysRule().contains("moreInfant")) {
+                allowanceDays = allowanceDays + request.getLeaveDetail().getMoreInfantLeaveDays();
+            }
+            if (allowancePolicy.getAllowanceDaysRule().contains("otherExtended")) {
+                allowanceDays = allowanceDays + request.getLeaveDetail().getOtherExtendedLeaveDays();
+            }
+        }
+
         descList.add(descPrefix + "津贴天数为" + allowanceDays);
         var baseSalary = baseSalaryOpt.get();
         descList.add(descPrefix + "公司月（缴费）平均工资为" + baseSalary.getCorpAverageSalary().toPlainString());

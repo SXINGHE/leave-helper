@@ -30,6 +30,8 @@ public class MoneyCalculateRequest {
     private LocalDate leaveEndDate;
     @Schema(description = "Calendar code", example = "CN")
     private String calendarCode;
+    @Schema(description = "leave detail", example = "from previous step response")
+    private LeaveDetail leaveDetail;
     /**
      * 过去12个月平均月薪
      */
