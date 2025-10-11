@@ -10,7 +10,7 @@ public class LeavePolicy {
     /**
      * 公休日是否延迟
      */
-    @Schema(description = "遇到公共机器是否顺延", example = "false")
+    @Schema(description = "遇到公共假期是否顺延", example = "false")
     private boolean delayForPublicHoliday = false;
     /**
      * 目前全部为calendarDay
@@ -19,10 +19,4 @@ public class LeavePolicy {
      */
     @Schema(description = "是否为日历日？目前所有城市均为日历日", example = "true")
     private boolean calendarDay = true;
-
-    /**
-     * 目前仅厦门有最大产假天数，为180天
-     */
-    @Schema(description = "最大产假天数，目前仅厦门有此值", example = "180")
-    private Integer maxLeaveDays;
 }

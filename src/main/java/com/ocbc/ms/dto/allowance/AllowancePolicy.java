@@ -26,11 +26,6 @@ public class AllowancePolicy {
     private BigDecimal denominator;
 
     /**
-     * 享受生育津贴天数
-     */
-    private int allowanceDays;
-
-    /**
      * 津贴天数规则 （法定产假，难产假，多胎假，奖励假）
      */
     private List<String> allowanceDaysRule;
