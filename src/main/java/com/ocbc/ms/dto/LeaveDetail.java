@@ -18,4 +18,12 @@ public class LeaveDetail {
     @Schema(description = "Total leave days", example = "98")
     private Integer currentLeaveDays = 0;
 
+    private int abortionLeaveDays;
+    private int statutoryLeaveDays;
+    private int dystociaLeaveDays;
+    private int moreInfantLeaveDays;
+    private int otherExtendedLeaveDays;
+    private int totalLeaveDays;
+
+
 }

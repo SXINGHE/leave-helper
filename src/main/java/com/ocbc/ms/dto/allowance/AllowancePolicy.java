@@ -29,6 +29,11 @@ public class AllowancePolicy {
      * 享受生育津贴天数
      */
     private int allowanceDays;
+
+    /**
+     * 津贴天数规则 （法定产假，难产假，多胎假，奖励假）
+     */
+    private List<String> allowanceDaysRule;
      /**
       * 目标账户类型，为企业/个人
       * 本系统仅记录，此字段不实际参与处理

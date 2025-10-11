@@ -34,6 +34,7 @@ public class CalculateDateUtil {
         LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
         leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, statutoryPolicy.getLeaveDays(), statutoryPolicy.isCalendarDay()));
         updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+        leaveDetail.setStatutoryLeaveDays(statutoryPolicy.getLeaveDays());
 
         calculateComments.getDescriptionList().add("1.法定产假，天数：" + statutoryPolicy.getLeaveDays());
         calculateComments.getDescriptionList().add("1.法定产假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
@@ -49,6 +50,7 @@ public class CalculateDateUtil {
             LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
             leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, dystociaPolicy.getStandardLeaveDays(), dystociaPolicy.isCalendarDay()));
             updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+            leaveDetail.setDystociaLeaveDays(dystociaPolicy.getStandardLeaveDays());
             calculateComments.getDescriptionList().add("2.难产假天数" + dystociaPolicy.getStandardLeaveDays());
             calculateComments.getDescriptionList().add("2.难产假 (标准难产假) 开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
         } else {
@@ -57,6 +59,7 @@ public class CalculateDateUtil {
                 LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
                 leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveDetail.getLeaveEndDate(), rule.getLeaveDays(), dystociaPolicy.isCalendarDay()));
                 updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+                leaveDetail.setDystociaLeaveDays(leaveDetail.getDystociaLeaveDays() + rule.getLeaveDays());
                 calculateComments.getDescriptionList().add("2.难产假天数" + rule.getLeaveDays());
                 calculateComments.getDescriptionList().add("2.难产假 ("+ rule.getDescription() + ") 开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
             });
@@ -70,8 +73,10 @@ public class CalculateDateUtil {
      */
     public void calculateMoreInfantLeave(DateCalculateRequest request, LeaveDetail leaveDetail,CalculateComments calculateComments, MoreInfantLeavePolicy moreInfantPolicy) {
         LocalDate leaveStartDate = leaveDetail.getLeaveEndDate();
-        leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, moreInfantPolicy.getExtraInfantLeaveDays() * (request.getInfantNumber() - 1), moreInfantPolicy.isCalendarDay()));
+        var leaveDays = moreInfantPolicy.getExtraInfantLeaveDays() * (request.getInfantNumber() - 1);
+        leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, leaveDays, moreInfantPolicy.isCalendarDay()));
         updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+        leaveDetail.setMoreInfantLeaveDays(leaveDays);
         calculateComments.getDescriptionList().add("3.多胎假，每多生育一胎奖励：" + moreInfantPolicy.getExtraInfantLeaveDays() +  "天，当前生育胎数为：" + request.getInfantNumber());
         calculateComments.getDescriptionList().add("3.多胎假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
     }
@@ -99,6 +104,7 @@ public class CalculateDateUtil {
             } else {
                 leaveDays = abortionRule.getLeaveDays();
             }
+            leaveDetail.setAbortionLeaveDays(leaveDays);
             calculateComments.getDescriptionList().add("1.流产假，假期天数为" + leaveDays);
             calculateComments.getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
         } else {
@@ -129,6 +135,7 @@ public class CalculateDateUtil {
                 leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, extendedRule.getLeaveDays(), otherExtendedPolicy.isCalendarDay()
                         , otherExtendedPolicy.isDelayForPublicHoliday(), request.getCalendarCode()));
                 updateCurrentLeaveDays(leaveDetail, leaveStartDate);
+                leaveDetail.setOtherExtendedLeaveDays(extendedRule.getLeaveDays());
                 if (StringUtils.isEmpty(extendedRule.getDescription())) {
                     calculateComments.getDescriptionList().add("4.奖励假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
                 } else {

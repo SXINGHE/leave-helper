@@ -19,6 +19,9 @@ public class LeaveRule {
     @Schema(description = "规则描述", example = "吸引产、钳产、臀位牵引产另加15天/妊娠满4个月流产，42天")
     private String description;
 
+    private Integer minLeaveDays;
+    private Integer maxLeaveDays;
+
     public LeaveRule() {
         this.ruleCode = UUID.randomUUID().toString();
     }

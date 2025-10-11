@@ -27,6 +27,8 @@ public class Policy {
 
     @Column(name = "city_name")
     private String cityName;
+    @Column(name = "max_leave_days")
+    private String maxLeaveDays;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "statutory_policy", columnDefinition = "jsonb")
