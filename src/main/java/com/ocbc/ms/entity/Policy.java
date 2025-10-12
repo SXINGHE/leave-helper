@@ -3,7 +3,6 @@ package com.ocbc.ms.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ocbc.ms.dto.allowance.AllowancePolicy;
 import com.ocbc.ms.dto.leave.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,13 +25,13 @@ public class Policy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "city_name")
-    private String cityName;
+    @Column(name = "city_code")
+    private String cityCode;
     /**
      * 目前仅厦门有最大产假天数，为180天
      */
     @Column(name = "max_leave_days")
-    private String maxLeaveDays;
+    private Integer maxLeaveDays;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "statutory_policy", columnDefinition = "jsonb")

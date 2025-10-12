@@ -1,8 +1,6 @@
 package com.ocbc.ms.controller;
 
 
-import com.ocbc.ms.dto.CalculateResponse;
-import com.ocbc.ms.dto.MoneyCalculateRequest;
 import com.ocbc.ms.dto.policy.PolicyDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,8 +19,6 @@ import com.ocbc.ms.repository.PolicyRepository;
 import com.ocbc.ms.entity.Policy;
 import com.ocbc.ms.dto.policy.PolicyCreateRequest;
 import com.ocbc.ms.dto.policy.PolicyUpdateRequest;
-
-import jakarta.validation.Valid;
 
 @Tag(name = "Policy", description = "Maternity leave policy management APIs")
 @RestController
@@ -55,7 +51,7 @@ public class PolicyController {
 
     private static Policy getPolicy(PolicyCreateRequest request) {
         Policy policy = new Policy();
-        policy.setCityName(request.getCityName());
+        policy.setCityCode(request.getCityName());
         policy.setStatutoryPolicy(request.getStatutoryPolicy());
         policy.setDystociaPolicy(request.getDystociaPolicy());
         policy.setMoreInfantPolicy(request.getMoreInfantPolicy());
@@ -79,7 +75,7 @@ public class PolicyController {
             return policyRepository.findById(id)
                     .map(existing -> {
                         // 仅更新可变字段，保持 id 不变
-                        existing.setCityName(request.getCityName());
+                        existing.setCityCode(request.getCityName());
                         existing.setStatutoryPolicy(request.getStatutoryPolicy());
                         existing.setDystociaPolicy(request.getDystociaPolicy());
                         existing.setMoreInfantPolicy(request.getMoreInfantPolicy());
@@ -105,7 +101,7 @@ public class PolicyController {
         Policy policy = policyRepository.findByCityName(cityName).orElse(null);
         PolicyDto policyDto = new PolicyDto();
         policyDto.setId(policy.getId());
-        policyDto.setCityName(policy.getCityName());
+        policyDto.setCityName(policy.getCityCode());
         policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
         policyDto.setDystociaPolicy(policy.getDystociaPolicy());
         policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());
