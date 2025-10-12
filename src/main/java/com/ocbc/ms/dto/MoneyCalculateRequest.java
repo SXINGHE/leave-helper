@@ -18,7 +18,7 @@ public class MoneyCalculateRequest {
      * drop down list
      */
     @Schema(description = "City name for policy lookup", example = "Guangzhou")
-    private String cityName;
+    private String cityCode;
     /**
      * E2P/OC
      */

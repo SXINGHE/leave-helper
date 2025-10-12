@@ -2,7 +2,6 @@ package com.ocbc.ms.service.impl;
 
 import com.ocbc.ms.dto.*;
 import com.ocbc.ms.dto.allowance.AllowancePolicy;
-import com.ocbc.ms.dto.leave.*;
 import com.ocbc.ms.repository.PolicyRepository;
 import com.ocbc.ms.service.MaternityLeaveService;
 import com.ocbc.ms.util.CalculateDateUtil;
@@ -16,9 +15,6 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +47,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             leaveDetail.setLeaveEndDate(request.getLeaveStartDate());
             var calculateComments = response.getCalculateComments();
 
-            var policyOpt = policyRepository.findByCityName(request.getCityName());
+            var policyOpt = policyRepository.findByCityCode(request.getCityCode());
 
             if (policyOpt.isEmpty()) {
                 throw new RuntimeException("Policy not found");
@@ -97,9 +93,9 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
     public CalculateResponse calculateMoney(MoneyCalculateRequest request) {
         CalculateResponse response = new CalculateResponse();
         var descList = response.getCalculateComments().getDescriptionList();
-        descList.add("计算生育津贴及其补差开始，当前城市为" + request.getCityName());
+        descList.add("计算生育津贴及其补差开始，当前城市为" + request.getCityCode());
 
-        var policyOpt = policyRepository.findByCityName(request.getCityName());
+        var policyOpt = policyRepository.findByCityCode(request.getCityCode());
         if (policyOpt.isEmpty()) {
             throw new RuntimeException("Policy not found");
         }

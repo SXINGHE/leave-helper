@@ -23,16 +23,7 @@ public class City {
     
     @Column(name = "city_name", nullable = false, length = 100)
     private String cityName;
-    
-    @Column(name = "province", nullable = false, length = 50)
-    private String province;
-    
-    @Column(name = "country", length = 50)
-    private String country = "中国";
-    
-    @Column(name = "timezone", length = 50)
-    private String timezone = "Asia/Shanghai";
-    
+
     @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;

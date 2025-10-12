@@ -1,6 +1,7 @@
 package com.ocbc.ms.dto.allowance;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ocbc.ms.dto.rule.DifferenceCompensationRule;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Data
 @Schema
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AllowancePolicy {
 
     /**

@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
-    @Query("SELECT h FROM Policy h WHERE h.cityName = :cityName ")
-    Optional<Policy> findByCityName(String cityName);
+    @Query("SELECT h FROM Policy h WHERE h.cityCode = :cityCode ")
+    Optional<Policy> findByCityCode(String cityCode);
 }

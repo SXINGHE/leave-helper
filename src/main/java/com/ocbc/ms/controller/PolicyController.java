@@ -20,6 +20,9 @@ import com.ocbc.ms.entity.Policy;
 import com.ocbc.ms.dto.policy.PolicyCreateRequest;
 import com.ocbc.ms.dto.policy.PolicyUpdateRequest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Tag(name = "Policy", description = "Maternity leave policy management APIs")
 @RestController
 @RequestMapping("/v1/policy")
@@ -51,7 +54,7 @@ public class PolicyController {
 
     private static Policy getPolicy(PolicyCreateRequest request) {
         Policy policy = new Policy();
-        policy.setCityCode(request.getCityName());
+        policy.setCityCode(request.getCityCode());
         policy.setStatutoryPolicy(request.getStatutoryPolicy());
         policy.setDystociaPolicy(request.getDystociaPolicy());
         policy.setMoreInfantPolicy(request.getMoreInfantPolicy());
@@ -67,21 +70,20 @@ public class PolicyController {
         @ApiResponse(responseCode = "404", description = "Policy not found"),
         @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Policy> updatePolicy(
-            @Parameter(description = "Policy ID") @PathVariable Long id, 
-            @RequestBody PolicyUpdateRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<Policy> updatePolicy(@RequestBody PolicyUpdateRequest request) {
         try {
-            return policyRepository.findById(id)
+            return policyRepository.findById(request.getId())
                     .map(existing -> {
                         // 仅更新可变字段，保持 id 不变
-                        existing.setCityCode(request.getCityName());
+                        existing.setCityCode(request.getCityCode());
                         existing.setStatutoryPolicy(request.getStatutoryPolicy());
                         existing.setDystociaPolicy(request.getDystociaPolicy());
                         existing.setMoreInfantPolicy(request.getMoreInfantPolicy());
                         existing.setOtherExtendedPolicy(request.getOtherExtendedPolicy());
                         existing.setAbortionPolicy(request.getAbortionPolicy());
                         existing.setAllowancePolicy(request.getAllowancePolicy());
+                        existing.setMaxLeaveDays(request.getMaxLeaveDays());
                         Policy saved = policyRepository.save(existing);
                         return ResponseEntity.ok(saved);
                     })
@@ -97,11 +99,11 @@ public class PolicyController {
             @ApiResponse(responseCode = "404", description = "Policy not found"),
     })
     @GetMapping("/fetch")
-    public ResponseEntity<PolicyDto> policyFetch(@RequestParam("cityName") String cityName) {
-        Policy policy = policyRepository.findByCityName(cityName).orElse(null);
+    public ResponseEntity<PolicyDto> policyFetch(@RequestParam("cityCode") String cityCode) {
+        Policy policy = policyRepository.findByCityCode(cityCode).orElse(null);
         PolicyDto policyDto = new PolicyDto();
         policyDto.setId(policy.getId());
-        policyDto.setCityName(policy.getCityCode());
+        policyDto.setCityCode(policy.getCityCode());
         policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
         policyDto.setDystociaPolicy(policy.getDystociaPolicy());
         policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());
@@ -110,6 +112,31 @@ public class PolicyController {
         policyDto.setAllowancePolicy(policy.getAllowancePolicy());
         return new ResponseEntity<>(policyDto, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get All Policy", description = "获取所有政策配置")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully get policy"),
+            @ApiResponse(responseCode = "404", description = "Policy not found"),
+    })
+    @GetMapping("/getAllPolicy")
+    public ResponseEntity<List<PolicyDto>> getAllPolicy() {
+        List<PolicyDto> response = new ArrayList<>();
+        List<Policy> policies = policyRepository.findAll();
+        policies.forEach(policy -> {
+            PolicyDto policyDto = new PolicyDto();
+            policyDto.setId(policy.getId());
+            policyDto.setCityCode(policy.getCityCode());
+            policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
+            policyDto.setDystociaPolicy(policy.getDystociaPolicy());
+            policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());
+            policyDto.setOtherExtendedPolicy(policy.getOtherExtendedPolicy());
+            policyDto.setAbortionPolicy(policy.getAbortionPolicy());
+            policyDto.setAllowancePolicy(policy.getAllowancePolicy());
+            response.add(policyDto);
+        });
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 
 }
