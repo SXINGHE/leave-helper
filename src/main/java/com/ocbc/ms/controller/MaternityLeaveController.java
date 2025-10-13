@@ -4,6 +4,9 @@ package com.ocbc.ms.controller;
 import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.CalculateResponse;
 import com.ocbc.ms.dto.MoneyCalculateRequest;
+import com.ocbc.ms.dto.history.SaveCalculationRequest;
+import com.ocbc.ms.entity.LeaveHistory;
+import com.ocbc.ms.repository.LeaveHistoryRepository;
 import com.ocbc.ms.service.MaternityLeaveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 
 /**
@@ -32,6 +37,9 @@ public class MaternityLeaveController {
 
     @Resource
     MaternityLeaveService maternityLeaveService;
+
+    @Resource
+    LeaveHistoryRepository leaveHistoryRepository;
 
 
     @Operation(summary = "Calculate maternity leave dates", description = "Calculate leave start date, end date and total days based on birth date and policy")
@@ -54,6 +62,29 @@ public class MaternityLeaveController {
     public ResponseEntity<CalculateResponse> calculateMoney(@RequestBody MoneyCalculateRequest request) {
         return new ResponseEntity<>(maternityLeaveService.calculateMoney(request), HttpStatus.OK);
     }
+
+    @Operation(summary = "save calculate result", description = "Calculate maternity allowance, compensation and salary details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully calculated allowance"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
+    @PostMapping("/calculateMoney")
+    public ResponseEntity<LeaveHistory> saveCalculateHistory(@RequestBody SaveCalculationRequest request) {
+
+        var leaveHistory = new LeaveHistory();
+        leaveHistory.setStaffName(request.getStaffName());
+        leaveHistory.setCityCode(request.getCityCode());
+        leaveHistory.setLeaveStartDate(request.getLeaveStartDate());
+        leaveHistory.setLeaveDetail(request.getLeaveDetail());
+        leaveHistory.setAllowanceDetail(request.getAllowanceDetail());
+        leaveHistory.setCalculateComments(request.getCalculateComments());
+        if (Objects.nonNull(request.getLeaveDetail()) && request.getLeaveDetail().getAbortionLeaveDays() > 0) {
+            leaveHistory.setAbortion(true);
+        }
+
+        return new ResponseEntity<>(leaveHistoryRepository.save(leaveHistory), HttpStatus.OK);
+    }
+
 
 
 
