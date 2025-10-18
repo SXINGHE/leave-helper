@@ -107,14 +107,22 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
             step.4 计算需补差
          */
         BigDecimal govAllowance = getGovAllowance(policy.getAllowancePolicy(), descList);
+        response.getAllowanceDetail().setAllowance(govAllowance);
+
         BigDecimal maternityAllowance = getMaternityAllowance(policy.getAllowancePolicy(), descList, request);
+        if (maternityAllowance.compareTo(govAllowance) > 0) {
+            response.getAllowanceDetail().setAllowance(maternityAllowance);
+        }
+
         BigDecimal salary = getSalary(descList, request, response.getAllowanceDetail());
         if ("Yes".equals(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
             || ("Only if".equalsIgnoreCase(policy.getAllowancePolicy().getDifferenceCompensationRule().getForceCompensation())
                     && request.isHitForceCompensationRule())) {
             var compensation = getCompensation(govAllowance, maternityAllowance, salary);
+            response.getAllowanceDetail().setCompensation(compensation);
             descList.add("4.需补差：" + compensation);
         } else {
+            response.getAllowanceDetail().setCompensation(BigDecimal.ZERO);
             descList.add("4.根据政策要求，此次产假津贴无需补差");
         }
         return response;
@@ -145,6 +153,7 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
                 .add(allowanceDetail.getLastMonthSalary())
                 .add(allowanceDetail.getOtherMonthSalary());
         descList.add(descPrefix + "总工资为" + totalSalary.toPlainString());
+        allowanceDetail.setTotalSalary(totalSalary);
         return totalSalary;
     }
 
