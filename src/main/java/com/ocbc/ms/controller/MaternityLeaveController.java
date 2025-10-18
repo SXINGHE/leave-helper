@@ -44,8 +44,8 @@ public class MaternityLeaveController {
 
     @Operation(summary = "Calculate maternity leave dates", description = "Calculate leave start date, end date and total days based on birth date and policy")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully calculated leave dates"),
-        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+            @ApiResponse(responseCode = "200", description = "Successfully calculated leave dates"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     @PostMapping("/calculateDate")
     public ResponseEntity<CalculateResponse> calculateDate(@RequestBody DateCalculateRequest request) {
@@ -55,8 +55,8 @@ public class MaternityLeaveController {
 
     @Operation(summary = "Calculate maternity leave allowance", description = "Calculate maternity allowance, compensation and salary details")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully calculated allowance"),
-        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+            @ApiResponse(responseCode = "200", description = "Successfully calculated allowance"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     @PostMapping("/calculateMoney")
     public ResponseEntity<CalculateResponse> calculateMoney(@RequestBody MoneyCalculateRequest request) {
@@ -68,10 +68,23 @@ public class MaternityLeaveController {
             @ApiResponse(responseCode = "200", description = "Successfully calculated allowance"),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
-    @PostMapping("/calculateMoney")
+    @PostMapping("/saveCalculateHistory")
     public ResponseEntity<LeaveHistory> saveCalculateHistory(@RequestBody SaveCalculationRequest request) {
+        if (Objects.nonNull(request.getId())) {
+            var leaveHistory = leaveHistoryRepository.findById(request.getId()).orElse(null);
+            if (Objects.nonNull(leaveHistory)) {
+                getLeaveHistory(request, leaveHistory);
+                return new ResponseEntity<>(leaveHistoryRepository.save(leaveHistory), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            var leaveHistory = new LeaveHistory();
+            getLeaveHistory(request, leaveHistory);
+            return new ResponseEntity<>(leaveHistoryRepository.save(leaveHistory), HttpStatus.OK);
+        }
+    }
 
-        var leaveHistory = new LeaveHistory();
+    private void getLeaveHistory(SaveCalculationRequest request, LeaveHistory leaveHistory) {
         leaveHistory.setStaffName(request.getStaffName());
         leaveHistory.setCityCode(request.getCityCode());
         leaveHistory.setLeaveStartDate(request.getLeaveStartDate());
@@ -81,11 +94,5 @@ public class MaternityLeaveController {
         if (Objects.nonNull(request.getLeaveDetail()) && request.getLeaveDetail().getAbortionLeaveDays() > 0) {
             leaveHistory.setAbortion(true);
         }
-
-        return new ResponseEntity<>(leaveHistoryRepository.save(leaveHistory), HttpStatus.OK);
     }
-
-
-
-
 }

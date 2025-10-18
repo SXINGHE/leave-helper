@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpecialDateRepository extends JpaRepository<SpecialDate, Long> {
@@ -18,6 +19,10 @@ public interface SpecialDateRepository extends JpaRepository<SpecialDate, Long> 
     @Query("SELECT h FROM SpecialDate h WHERE h.calendarCode = :calendarCode " +
             "AND h.year = :year AND h.isActive = true")
     List<SpecialDate> findByCalendarCodeAndYear(@Param("calendarCode") String calendarCode, @Param("year") Integer year);
+
+    @Query("SELECT h FROM SpecialDate h WHERE h.calendarCode = :calendarCode " +
+            "AND h.calendarDate = :calendarDate AND h.isActive = true")
+    Optional<SpecialDate> findByCalendarCodeAndDate(@Param("calendarCode") String calendarCode, @Param("calendarDate") LocalDate calendarDate);
 
 
     @Query("SELECT h FROM SpecialDate h WHERE h.calendarCode = :calendarCode " +

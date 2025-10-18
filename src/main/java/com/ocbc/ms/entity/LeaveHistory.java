@@ -6,6 +6,8 @@ import com.ocbc.ms.dto.CalculateComments;
 import com.ocbc.ms.dto.LeaveDetail;
 import lombok.Data;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 
@@ -23,11 +25,14 @@ public class LeaveHistory {
     private String cityCode;
     @Column(name = "leave_start_date")
     private LocalDate leaveStartDate;
-    @Column(name = "leave_detail")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "leave_detail", columnDefinition = "jsonb")
     private LeaveDetail leaveDetail;
-    @Column(name = "allowance_detail")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "allowance_detail", columnDefinition = "jsonb")
     private AllowanceDetail allowanceDetail;
-    @Column(name = "calculate_comments")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "calculate_comments", columnDefinition = "jsonb")
     private CalculateComments calculateComments;
     /**
      * 是否为流产

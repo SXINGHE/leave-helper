@@ -66,8 +66,8 @@ public class CalendarController {
 
     @Operation(summary = "Setup calendar special dates", description = "Configure holidays and special working days for a calendar")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully setup calendar"),
-        @ApiResponse(responseCode = "400", description = "Invalid request data")
+            @ApiResponse(responseCode = "200", description = "Successfully setup calendar"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PostMapping("/setup-calendar")
     public ResponseEntity<SpecialDateSetupResponse> setupCalendar(@Valid @RequestBody SpecialDateSetupRequest request) {
@@ -77,4 +77,5 @@ public class CalendarController {
             return ResponseEntity.badRequest().build();
         }
     }
+
 }

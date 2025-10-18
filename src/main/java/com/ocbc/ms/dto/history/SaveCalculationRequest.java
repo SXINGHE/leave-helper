@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Data
 public class SaveCalculationRequest {
 
+     private Long id;
+
      private String staffName;
      private String cityCode;
      private LocalDate leaveStartDate;
