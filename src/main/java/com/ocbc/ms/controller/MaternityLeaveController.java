@@ -16,11 +16,9 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -82,6 +80,16 @@ public class MaternityLeaveController {
             getLeaveHistory(request, leaveHistory);
             return new ResponseEntity<>(leaveHistoryRepository.save(leaveHistory), HttpStatus.OK);
         }
+    }
+
+    @Operation(summary = "get calculate history", description = "Calculate maternity allowance, compensation and salary details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully calculated allowance"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
+    @GetMapping("/getCalculateHistory")
+    public ResponseEntity<List<LeaveHistory>> getCalculateHistory() {
+        return new ResponseEntity<>(leaveHistoryRepository.findAll(), HttpStatus.OK);
     }
 
     private void getLeaveHistory(SaveCalculationRequest request, LeaveHistory leaveHistory) {
