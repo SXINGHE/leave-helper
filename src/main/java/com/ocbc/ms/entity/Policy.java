@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.JdbcTypeCode;
 import jakarta.persistence.Column;
-
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 /**
  * we should find policy by city name and Company name
@@ -19,6 +21,8 @@ import jakarta.persistence.Column;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@SQLDelete(sql = "UPDATE t_policy SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class Policy {
 
     @Id
@@ -56,6 +60,10 @@ public class Policy {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "allowance_policy", columnDefinition = "jsonb")
     private AllowancePolicy allowancePolicy;
+
+    @Column(name = "deleted", nullable = false)
+    @ColumnDefault("false")
+    private boolean deleted = false;
 
 
 }

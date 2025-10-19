@@ -113,6 +113,21 @@ public class PolicyController {
         return new ResponseEntity<>(policyDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete policy by ID", description = "Soft delete a policy by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted policy"),
+            @ApiResponse(responseCode = "404", description = "Policy not found")
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deletePolicy(@PathVariable Long id) {
+        return policyRepository.findById(id)
+                .map(policy -> {
+                    policyRepository.delete(policy);
+                    return ResponseEntity.ok().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @Operation(summary = "Get All Policy", description = "获取所有政策配置")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully get policy"),
