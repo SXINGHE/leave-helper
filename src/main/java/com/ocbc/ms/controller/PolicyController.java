@@ -2,6 +2,7 @@ package com.ocbc.ms.controller;
 
 
 import com.ocbc.ms.dto.policy.PolicyDto;
+import com.ocbc.ms.entity.City;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ public class PolicyController {
  
     @Autowired
     private PolicyRepository policyRepository;
+
 
     @Operation(summary = "Create new policy", description = "Create a new maternity leave policy for a city")
     @ApiResponses(value = {
@@ -118,14 +120,18 @@ public class PolicyController {
             @ApiResponse(responseCode = "200", description = "Successfully get policy"),
             @ApiResponse(responseCode = "404", description = "Policy not found"),
     })
-    @GetMapping("/getAllPolicy")
+    @GetMapping("/all")
     public ResponseEntity<List<PolicyDto>> getAllPolicy() {
         List<PolicyDto> response = new ArrayList<>();
+
+//        List<City> cities = cityRepository.findAll();
+
         List<Policy> policies = policyRepository.findAll();
         policies.forEach(policy -> {
             PolicyDto policyDto = new PolicyDto();
             policyDto.setId(policy.getId());
             policyDto.setCityCode(policy.getCityCode());
+            policyDto.setCityName(policy.getCityCode());
             policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
             policyDto.setDystociaPolicy(policy.getDystociaPolicy());
             policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());

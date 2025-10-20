@@ -35,6 +35,7 @@ public class DateCalculateRequest {
      */
     @Schema(description = "City name for policy lookup", example = "Guangzhou")
     private String cityCode;
+    private String cityName;
 
     /**
      * E2P/OC

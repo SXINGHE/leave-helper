@@ -1,6 +1,7 @@
 package com.ocbc.ms.controller;
 
 
+import ch.qos.logback.core.util.StringUtil;
 import com.ocbc.ms.dto.DateCalculateRequest;
 import com.ocbc.ms.dto.CalculateResponse;
 import com.ocbc.ms.dto.MoneyCalculateRequest;
@@ -8,6 +9,7 @@ import com.ocbc.ms.dto.history.SaveCalculationRequest;
 import com.ocbc.ms.entity.LeaveHistory;
 import com.ocbc.ms.repository.LeaveHistoryRepository;
 import com.ocbc.ms.service.MaternityLeaveService;
+import com.ocbc.ms.util.SpecUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,6 +49,11 @@ public class MaternityLeaveController {
     })
     @PostMapping("/calculateDate")
     public ResponseEntity<CalculateResponse> calculateDate(@RequestBody DateCalculateRequest request) {
+
+        if(StringUtil.isNullOrEmpty(request.getCityCode())) {
+            request.setCityCode(SpecUtil.capitalizeFirstChar(request.getCityName()));
+        }
+
         return new ResponseEntity<>(maternityLeaveService.calculateDate(request), HttpStatus.OK);
     }
 
@@ -58,6 +65,9 @@ public class MaternityLeaveController {
     })
     @PostMapping("/calculateMoney")
     public ResponseEntity<CalculateResponse> calculateMoney(@RequestBody MoneyCalculateRequest request) {
+        if(StringUtil.isNullOrEmpty(request.getCityCode())) {
+            request.setCityCode(SpecUtil.capitalizeFirstChar(request.getCityName()));
+        }
         return new ResponseEntity<>(maternityLeaveService.calculateMoney(request), HttpStatus.OK);
     }
 

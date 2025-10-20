@@ -16,6 +16,8 @@ public class PolicyDto {
     @Schema(description = "城市名称", example = "Shanghai")
     private String cityCode;
 
+    private String cityName;
+
     @Schema(description = "法定产假政策配置")
     private StatutoryLeavePolicy statutoryPolicy;
 
