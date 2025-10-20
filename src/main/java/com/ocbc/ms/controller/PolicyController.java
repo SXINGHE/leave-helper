@@ -3,6 +3,7 @@ package com.ocbc.ms.controller;
 
 import com.ocbc.ms.dto.policy.PolicyDto;
 import com.ocbc.ms.entity.City;
+import com.ocbc.ms.repository.CityRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ import com.ocbc.ms.dto.policy.PolicyUpdateRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "Policy", description = "Maternity leave policy management APIs")
 @RestController
@@ -32,7 +34,8 @@ public class PolicyController {
  
     @Autowired
     private PolicyRepository policyRepository;
-
+    @Autowired
+    private CityRepository cityRepository;
 
     @Operation(summary = "Create new policy", description = "Create a new maternity leave policy for a city")
     @ApiResponses(value = {
@@ -122,12 +125,8 @@ public class PolicyController {
     })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePolicy(@PathVariable Long id) {
-        return policyRepository.findById(id)
-                .map(policy -> {
-                    policyRepository.delete(policy);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        policyRepository.hardDeleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Get All Policy", description = "获取所有政策配置")
@@ -135,18 +134,21 @@ public class PolicyController {
             @ApiResponse(responseCode = "200", description = "Successfully get policy"),
             @ApiResponse(responseCode = "404", description = "Policy not found"),
     })
-    @GetMapping("/all")
+    @GetMapping("/getAllPolicy")
     public ResponseEntity<List<PolicyDto>> getAllPolicy() {
         List<PolicyDto> response = new ArrayList<>();
 
-//        List<City> cities = cityRepository.findAll();
+        List<City> cities = cityRepository.findAll();
+
+        var cityMap = cities.stream().collect(Collectors.toMap(City::getCityCode, City::getCityName));
+
 
         List<Policy> policies = policyRepository.findAll();
         policies.forEach(policy -> {
             PolicyDto policyDto = new PolicyDto();
             policyDto.setId(policy.getId());
             policyDto.setCityCode(policy.getCityCode());
-            policyDto.setCityName(policy.getCityCode());
+            policyDto.setCityName(cityMap.get(policy.getCityCode()));
             policyDto.setStatutoryPolicy(policy.getStatutoryPolicy());
             policyDto.setDystociaPolicy(policy.getDystociaPolicy());
             policyDto.setMoreInfantPolicy(policy.getMoreInfantPolicy());

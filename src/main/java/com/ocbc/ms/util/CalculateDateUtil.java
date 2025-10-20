@@ -95,8 +95,6 @@ public class CalculateDateUtil {
                 .filter(rule -> request.getAbortionCode().equalsIgnoreCase(rule.getRuleCode())).findFirst();
         if (abortionRuleOpt.isPresent()) {
             var abortionRule = abortionRuleOpt.get();
-            leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, abortionRule.getLeaveDays(), abortionPolicy.isCalendarDay()));
-            updateCurrentLeaveDays(leaveDetail, leaveStartDate);
             calculateComments.getDescriptionList().add("1.流产假，找到流产假规则" + abortionRule.getDescription());
             Integer leaveDays = null;
             if (Objects.isNull(abortionRule.getLeaveDays())) {
@@ -105,6 +103,8 @@ public class CalculateDateUtil {
                 leaveDays = abortionRule.getLeaveDays();
             }
             leaveDetail.setAbortionLeaveDays(leaveDays);
+            leaveDetail.setLeaveEndDate(dateUtil.getEndDate(leaveStartDate, leaveDays, abortionPolicy.isCalendarDay()));
+            updateCurrentLeaveDays(leaveDetail, leaveStartDate);
             calculateComments.getDescriptionList().add("1.流产假，假期天数为" + leaveDays);
             calculateComments.getDescriptionList().add("1.流产假，开始日：" + leaveStartDate +  "结束日：" + leaveDetail.getLeaveEndDate());
         } else {
