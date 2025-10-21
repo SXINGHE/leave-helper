@@ -166,8 +166,8 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         var dailySalary = request.getCurrentSalary().divide(new BigDecimal(initSalaryDays), 2, RoundingMode.HALF_UP);
         descList.add(descPrefix + "每日工资为" + dailySalary.toPlainString());
         int adjustDays = dateUtil.getRealSalaryDays(request.getLeaveStartDate(), dateUtil.getLastDayOfMonth(request.getLeaveStartDate()),request.getCalendarCode());
-        descList.add(descPrefix + "调整天数为" + adjustDays);
-        var firstMonthSalary = dailySalary.multiply(new BigDecimal(initSalaryDays - adjustDays));
+        descList.add(descPrefix + "调整天数为" + (initSalaryDays - adjustDays));
+        var firstMonthSalary = dailySalary.multiply(new BigDecimal(adjustDays));
         descList.add(descPrefix + "第一个月工资为" + firstMonthSalary.toPlainString());
         allowanceDetail.setFirstMonthSalary(firstMonthSalary);
     }
@@ -181,8 +181,9 @@ public class MaternityLeaveServiceImpl implements MaternityLeaveService {
         var dailySalary = request.getCurrentSalary().divide(new BigDecimal(initSalaryDays), 2, RoundingMode.HALF_UP);
         descList.add(descPrefix + "每日工资为" + dailySalary.toPlainString());
         int adjustDays = dateUtil.getRealSalaryDays(dateUtil.getFirstDayOfMonth(request.getLeaveEndDate()), request.getLeaveEndDate(), request.getCalendarCode());
-        descList.add(descPrefix + "调整天数为" + adjustDays);
-        var lastMonthSalary = dailySalary.multiply(new BigDecimal(initSalaryDays - adjustDays));
+        descList.add(descPrefix + "调整天数为" + (initSalaryDays - adjustDays));
+        var lastMonthSalary = dailySalary.multiply(new BigDecimal(adjustDays));
+//        var lastMonthSalary = dailySalary.multiply(new BigDecimal(initSalaryDays - adjustDays));
         descList.add(descPrefix + "最后一个月工资为" + lastMonthSalary.toPlainString());
         allowanceDetail.setLastMonthSalary(lastMonthSalary);
     }
